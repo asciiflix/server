@@ -2,14 +2,15 @@ package api
 
 import (
 	"fmt"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 func StartRouter() {
 	r := mux.NewRouter()
 	initHandler(r)
-	fmt.Println("Stating API")
+	fmt.Println("Starting API")
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
