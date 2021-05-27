@@ -9,9 +9,17 @@ services:
     volumes:
       - data:/var/lib/postgresql/data
   server:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build: 
+      context: ./
+      target: prod
+    volumes:
+    - ./:/go/src/work/
+    ports:
+    - 5001:5000
+    - 2345:2345
+    - 8080:8080
+    security_opt:
+    - "seccomp:unconfined"
     env_file: .env
     depends_on:
       - database
@@ -19,8 +27,6 @@ services:
       - database
     networks:
       - default
-    ports:
-      - "8080:8080"
 
 volumes:
   data:
