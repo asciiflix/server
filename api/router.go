@@ -6,9 +6,10 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"gorm.io/gorm"
 )
 
-func StartRouter() {
+func StartRouter(db *gorm.DB) {
 	r := mux.NewRouter()
 	initHandler(r)
 	fmt.Println("Starting API")
