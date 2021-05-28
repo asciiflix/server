@@ -5,6 +5,8 @@ services:
     container_name: asciiflix_db
     restart: always
     env_file: .env
+    networks: 
+      - backend
     volumes:
       - data:/var/lib/postgresql/data
   server:
@@ -12,13 +14,24 @@ services:
       context: .
     image: asciiflix_server
     container_name: asciiflix_server
-    ports:
-      - 8080:8080
     env_file: .env
     depends_on:
       - database
+    expose: 
+      - 8080
+    labels:
+    - "traefik.enable=true"
+    - "traefik.docker.network=proxy"
+    - "traefik.http.routers.asciiflix_server.rule=Host(`api.asciiflix.tech`)"
+    - "traefik.http.routers.asciiflix_server.entrypoints=websecure"
+    - "traefik.http.routers.asciiflix_server.tls.certresolver=myhttpchallenge"
     networks:
-      - default
+      - backend
+      - proxy
 
 volumes:
   data:
+networks: 
+  backend:
+  proxy:
+    external: true
