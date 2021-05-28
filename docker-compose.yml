@@ -20,11 +20,11 @@ services:
     expose: 
       - 8080
     labels:
-    - "traefik.enable=true"
-    - "traefik.docker.network=proxy"
-    - "traefik.http.routers.asciiflix_server.rule=Host(`api.asciiflix.tech`)"
-    - "traefik.http.routers.asciiflix_server.entrypoints=websecure"
-    - "traefik.http.routers.asciiflix_server.tls.certresolver=myhttpchallenge"
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.asciiflix_server.rule=Host(`api.asciiflix.tech`)"
+      - "traefik.http.routers.asciiflix_server.entrypoints=websecure"
+      - "traefik.http.routers.asciiflix_server.tls.certresolver=myhttpchallenge"
     networks:
       - backend
       - proxy
