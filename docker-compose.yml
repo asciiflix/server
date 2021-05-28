@@ -1,33 +1,24 @@
-version: "3.7"
+version: "3"
 services:
   database:
-    image: postgres
+    image: postgres:13
+    container_name: asciiflix_db
     restart: always
     env_file: .env
-    ports:
-      - "5432:5432"
     volumes:
       - data:/var/lib/postgresql/data
   server:
     build:
-      context: ./
-      target: prod
-    volumes:
-      - ./:/go/src/work/
+      context: .
+    image: asciiflix_server
+    container_name: asciiflix_server
     ports:
-      - 5001:5000
-      - 2345:2345
       - 8080:8080
-    security_opt:
-      - "seccomp:unconfined"
     env_file: .env
     depends_on:
       - database
-    links:
-      - database
     networks:
       - default
-    entrypoint: /bin/bash
 
 volumes:
   data:
