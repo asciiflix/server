@@ -1,4 +1,4 @@
-package storage
+package database
 
 import (
 	"fmt"
@@ -6,15 +6,10 @@ import (
 	"os"
 	"time"
 
+	"github.com/asciiflix/server/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
-
-type User struct {
-	gorm.Model
-	Name     string
-	Password string
-}
 
 func StartDatabase() (db *gorm.DB) {
 
@@ -39,7 +34,7 @@ func StartDatabase() (db *gorm.DB) {
 	}
 	fmt.Println("DB Connected")
 
-	db.Debug().AutoMigrate(&User{})
+	db.Debug().AutoMigrate(&model.User{})
 
 	return
 }
