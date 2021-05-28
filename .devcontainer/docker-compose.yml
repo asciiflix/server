@@ -1,0 +1,21 @@
+version: "3"
+
+services:
+  workspace:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ..:/workspace:cached
+    env_file: ../.env
+    command: /bin/zsh -c "while sleep 1000; do :; done"
+  database:
+    image: postgres
+    restart: unless-stopped
+    env_file: ../.env
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+
+volumes:
+  postgres-data:
