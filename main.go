@@ -8,6 +8,8 @@ import (
 	"github.com/asciiflix/server/database"
 )
 
+var Version string
+
 func main() {
 	fmt.Println("ASCIIflix Server")
 	config.GetConfig()
