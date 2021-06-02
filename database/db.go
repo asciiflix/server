@@ -3,9 +3,9 @@ package database
 import (
 	"fmt"
 	"net/url"
-	"os"
 	"time"
 
+	"github.com/asciiflix/server/config"
 	"github.com/asciiflix/server/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -13,18 +13,11 @@ import (
 
 func StartDatabase() (db *gorm.DB) {
 
-	dbUser, dbPassword, dbName, dbHost, dbPort :=
-		os.Getenv("POSTGRES_USER"),
-		os.Getenv("POSTGRES_PASSWORD"),
-		os.Getenv("POSTGRES_DB"),
-		os.Getenv("POSTGRES_HOST"),
-		os.Getenv("POSTGRES_PORT")
-
 	dsn := url.URL{
-		User:     url.UserPassword(dbUser, dbPassword),
+		User:     url.UserPassword(config.Database.User, config.Database.Password),
 		Scheme:   "postgres",
-		Host:     fmt.Sprintf("%s:%s", dbHost, dbPort),
-		Path:     dbName,
+		Host:     fmt.Sprintf("%s:%s", config.Database.Host, config.Database.Port),
+		Path:     config.Database.Db,
 		RawQuery: (&url.Values{"sslmode": []string{"disable"}}).Encode(),
 	}
 	time.Sleep(5 * time.Second)

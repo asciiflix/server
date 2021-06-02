@@ -4,7 +4,10 @@ services:
     image: postgres:13
     container_name: asciiflix_db
     restart: always
-    env_file: .env
+    environment:
+      - POSTGRES_DB=asciiflix_db
+      - POSTGRES_USER=asciiflix
+      - POSTGRES_PASSWORD=asciiflixpassword
     networks: 
       - backend
     volumes:
@@ -14,7 +17,12 @@ services:
       context: .
     image: asciiflix_server
     container_name: asciiflix_server
-    env_file: .env
+    environment:
+      - POSTGRES_HOST=database
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=asciiflix_db
+      - POSTGRES_USER=asciiflix
+      - POSTGRES_PASSWORD=asciiflixpassword
     depends_on:
       - database
     expose: 
