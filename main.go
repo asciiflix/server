@@ -9,6 +9,6 @@ import (
 
 func main() {
 	fmt.Println("ASCIIflix Server")
-	db := database.StartDatabase()
-	controller.StartRouter(db)
+	database.StartDatabase()
+	controller.StartRouter()
 }

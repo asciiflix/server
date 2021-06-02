@@ -11,7 +11,9 @@ import (
 	"gorm.io/gorm"
 )
 
-func StartDatabase() (db *gorm.DB) {
+var global_db *gorm.DB
+
+func StartDatabase() {
 
 	dbUser, dbPassword, dbName, dbHost, dbPort :=
 		os.Getenv("POSTGRES_USER"),
@@ -33,8 +35,7 @@ func StartDatabase() (db *gorm.DB) {
 		panic("Can't connect to database!")
 	}
 	fmt.Println("DB Connected")
+	global_db = db
 
-	db.Debug().AutoMigrate(&model.User{})
-
-	return
+	db.AutoMigrate(&model.User{})
 }
