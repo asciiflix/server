@@ -72,7 +72,6 @@ func status(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(`{"status": "Healthy"}`))
 }
 func home(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(fmt.Sprintf("Welcome to our Backend running on %s :o", config.Version)))
 
