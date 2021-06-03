@@ -3,12 +3,17 @@ package main
 import (
 	"fmt"
 
-	controller "github.com/asciiflix/server/controller"
+	"github.com/asciiflix/server/config"
+	"github.com/asciiflix/server/controller"
 	"github.com/asciiflix/server/database"
 )
 
+var Version string
+
 func main() {
-	fmt.Println("ASCIIflix Server")
+	fmt.Print("ASCIIflix Server ")
+	fmt.Println(config.Version)
+	config.GetConfig()
 	database.StartDatabase()
 	controller.StartRouter()
 }
