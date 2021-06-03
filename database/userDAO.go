@@ -1,14 +1,16 @@
 package database
 
 import (
+	"os"
 	"time"
 
 	"github.com/asciiflix/server/model"
+	"github.com/asciiflix/server/utils"
 	"github.com/dgrijalva/jwt-go"
-	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
+//Register User in Database with Error Handling
 func RegisterUser(user model.User) map[string]interface{} {
 	//Check if User already exists
 	if err := global_db.Where("email = ?", user.Email).First(&model.User{}).Error; err != gorm.ErrRecordNotFound {
@@ -16,11 +18,9 @@ func RegisterUser(user model.User) map[string]interface{} {
 	}
 
 	//BCrypt Password
-	bytes, err := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
+	err := utils.GenerateBCryptFromPassword(&user)
 	if err != nil {
 		return map[string]interface{}{"message": "Password Encryption Failed."}
-	} else {
-		user.Password = string(bytes)
 	}
 
 	//Register User in DB
@@ -28,36 +28,43 @@ func RegisterUser(user model.User) map[string]interface{} {
 	return map[string]interface{}{"message": "User successfully registered."}
 }
 
-func LoginUser(email string, password string) map[string]interface{} {
-	//Check if User exists
+//Login Function, search for Users in database an retrun a JWT Token
+func LoginUser(login_data model.UserLogin) map[string]interface{} {
+	//Check if User does not exist
 	user := model.User{}
-	result := global_db.Where("email = ?", email).First(&user)
+	result := global_db.Where("email = ?", login_data.Email).First(&user)
 	if result.Error == gorm.ErrRecordNotFound {
 		return map[string]interface{}{"message": "User does not exist."}
 	}
 
 	//Verify BCrypt
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
+	err := utils.CompPasswordAndHash(user, login_data.Password)
+	if err != nil {
 		return map[string]interface{}{"message": "Wrong Password"}
 	}
 
-	//Login return jwt token
-
-	jwtTokenContent := jwt.MapClaims{
-		"user_id":    user.ID,
-		"user_email": user.Email,
-		"user_name":  user.Name,
-		"ExpiresAt":  time.Now().Add(time.Second ^ 30).Unix(),
-		"iss":        "api.asciiflix.tex",
+	//Create JWT Token
+	jwtClaim := model.UserClaim{
+		User_ID:    user.ID,
+		User_email: user.Email,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(time.Hour ^ 24).Unix(),
+			IssuedAt:  time.Now().Unix(),
+			Issuer:    "apt.asciiflix.tech",
+		},
 	}
 
-	jwtToken := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), jwtTokenContent)
-	token, err := jwtToken.SignedString([]byte("MyPassword"))
+	//Sign Token with Key
+	mySigningKey := os.Getenv("JWT_PRIVATE_KEY")
+	jwtToken := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), jwtClaim)
+	token, err := jwtToken.SignedString([]byte(mySigningKey))
 
+	//Checking for Errors in Token Generation
 	if err != nil {
 		return map[string]interface{}{"message": "JWT Error"}
 	}
 
+	//Return JWT Token, "User" should save his Token, to interact with the API
 	var response = map[string]interface{}{"message": "Successfully logged in"}
 	response["jwt"] = token
 

@@ -4,54 +4,59 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
+	"os"
 
+	"github.com/asciiflix/server/model"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 )
 
 func initHandler(router *mux.Router) {
-	router.Use(jwtCheck)
+	//Public Endpoints
 	router.Path("/status").HandlerFunc(status).Methods(http.MethodGet)
 	router.Path("/register").HandlerFunc(register).Methods(http.MethodPost)
 	router.Path("/login").HandlerFunc(login).Methods(http.MethodPost)
-	router.Path("/my_status").HandlerFunc(status).Methods(http.MethodGet)
+
+	//Secure (JWT) Endpoints
+	protected := router.PathPrefix("/secure").Subrouter()
+	protected.Use(jwtCheck)
+	protected.Path("/my_status").HandlerFunc(status).Methods(http.MethodGet)
+
 }
 
+//Check JWT Token for User Authentication
 func jwtCheck(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.RequestURI == "/status" || r.RequestURI == "/login" || r.RequestURI == "/register" {
-			println("No Auth needed!")
-			next.ServeHTTP(w, r)
-			return
-		}
-
+		//Checking if there is an existent Header Key "Token"
 		if r.Header["Token"] == nil {
-			json.NewEncoder(w).Encode("No JWT Token")
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(map[string]interface{}{"message": "No JWT Token"})
 			return
 		}
 
-		var mySigningKey = []byte("MyPassword")
+		mySigningKey := os.Getenv("JWT_PRIVATE_KEY")
 
-		token, err := jwt.Parse(r.Header["Token"][0], func(token *jwt.Token) (interface{}, error) {
-			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, json.NewEncoder(w).Encode("JWT Parsing Error (Signing Method)")
-			}
-			return mySigningKey, nil
-		})
+		//Parse Incoming JWT Token. Token must be in the Header with the Key "Token"
+		token, err := jwt.ParseWithClaims(
+			r.Header["Token"][0],
+			&model.UserClaim{},
+			func(token *jwt.Token) (interface{}, error) {
+				return []byte(mySigningKey), nil
+			},
+		)
 
+		//Checking for JWT Parsing Errors like (Invalid JWT Token or if the Token is expired)
 		if err != nil {
-			json.NewEncoder(w).Encode("JWT Token expired")
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(map[string]interface{}{"message": "JWT Token Expired"})
 			return
 		}
 
 		//Not Checking for errors in claims
-		if claims, _ := token.Claims.(jwt.MapClaims); token.Valid {
-			if claims.VerifyExpiresAt(time.Now().Unix(), true) {
-				json.NewEncoder(w).Encode("JWT Token expired")
-				return
-			}
-			fmt.Println("email:", claims["user_email"], " // id:", claims["user_id"])
+		if claims, _ := token.Claims.(*model.UserClaim); token.Valid {
+			fmt.Println("email:", claims.User_email, " // id:", claims.User_ID)
 			next.ServeHTTP(w, r)
 			return
 		}
