@@ -1,5 +1,10 @@
 # API Authentication
 
+# Overview
+- [Register](#register)
+- [Login](#login)
+- [Use Secure Endpoints](#use-secure-endpoints)
+
 # Register
 You can register a User at ``/register`` like this JSON Body:
 ````json
@@ -54,4 +59,11 @@ If you using Credentials for a User which does not exists, you will get:
 ````
 
 # Use Secure Endpoints
+If you want to access secure endpoints like ``/secure/my_status``, you will need a valid JWT-Token. <br>
+No JWT-Token? -> How to get a JWT-Token, please read:
+
+Now you can simply at the JWT-Token to your http-headers with the Key ``Token`` and the Value will be your JWT-Token. Here is an example:<br>
+``Token:yourPrivatJWTToken``
+
+Keep in mind do NOT share your private JWT-Token, the API can´t block an existing token, your JWT-Token is valid until the expire time is reached.
 
