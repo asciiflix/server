@@ -11,7 +11,8 @@ import (
 var Version string
 
 func main() {
-	fmt.Println("ASCIIflix Server")
+	fmt.Print("ASCIIflix Server ")
+	fmt.Println(config.Version)
 	config.GetConfig()
 	db := database.StartDatabase()
 	controller.StartRouter(db)

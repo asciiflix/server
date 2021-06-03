@@ -8,13 +8,15 @@ services:
       - POSTGRES_DB=asciiflix_db
       - POSTGRES_USER=asciiflix
       - POSTGRES_PASSWORD=asciiflixpassword
-    networks: 
+    networks:
       - backend
     volumes:
       - data:/var/lib/postgresql/data
   server:
     build:
       context: .
+      args:
+        - VERSION=TEST
     image: asciiflix_server
     container_name: asciiflix_server
     environment:
@@ -25,7 +27,7 @@ services:
       - POSTGRES_PASSWORD=asciiflixpassword
     depends_on:
       - database
-    expose: 
+    expose:
       - 8080
     labels:
       - "traefik.enable=true"
@@ -39,7 +41,7 @@ services:
 
 volumes:
   data:
-networks: 
+networks:
   backend:
   proxy:
     external: true
