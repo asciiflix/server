@@ -1,10 +1,396 @@
 {
 	"info": {
-		"_postman_id": "69b46376-5b8d-46b8-96e8-a58ecea35d37",
-		"name": "ASCIIflix - Server -API",
+		"_postman_id": "8d41f60a-5c75-4d72-adbd-262cda76da33",
+		"name": "ASCIIflix - Server - API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
+		{
+			"name": "User - Register",
+			"item": [
+				{
+					"name": "Register User - Normal",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status Code is 201\", function() {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Correct Message\", function () {\r",
+									"    pm.response.to.have.body('{\"message\":\"User successfully registered.\"}\\n');\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let userName = pm.variables.replaceIn(\"{{$randomUserName}}\")\r",
+									"let userPassword = pm.variables.replaceIn(\"{{$randomPassword}}\")\r",
+									"pm.globals.set(\"randomUser\", userName);\r",
+									"pm.globals.set(\"randomPaswword\", userPassword);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"{{randomUser}}@asciiflix.tech\",\r\n    \"name\": \"{{randomUser}}\",\r\n    \"password\":\"{{randomPassword}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/register",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register User - Which Exists",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status Code is 400\", function() {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Correct Message\", function () {\r",
+									"    pm.response.to.have.body('{\"message\":\"User already exists.\"}\\n');\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"{{randomUser}}@asciiflix.tech\",\r\n    \"name\": \"{{randomUser}}\",\r\n    \"password\":\"{{randomPassword}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/register",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User - Login",
+			"item": [
+				{
+					"name": "Login - Existing user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status Code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"var jsonData = JSON.parse(responseBody);\r",
+									"\r",
+									"pm.test(\"Recieving JWT Token\", function () {\r",
+									"    pm.globals.set(\"jwtToken\", jsonData.jwt);\r",
+									"    pm.expect(jsonData.jwt).to.exist\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Correct Message\", function () {\r",
+									"    pm.expect(jsonData.message).to.equal(\"Successfully logged in\")\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"{{randomUser}}@asciiflix.tech\",\r\n    \"password\":\"{{randomPassword}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/login",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login - Existing user wrong PW",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status Code is 401\", function() {\r",
+									"    pm.response.to.have.status(401);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Correct Message\", function () {\r",
+									"    pm.response.to.have.body('{\"message\":\"Wrong Password\"}\\n');\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"{{randomUser}}@asciiflix.tech\",\r\n    \"password\":\"{{randomPassword}} + 1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/login",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login - Not Existing User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status Code is 404\", function() {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Correct Message\", function () {\r",
+									"    pm.response.to.have.body('{\"message\":\"User does not exist.\"}\\n');\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"{{randomUser}}@asciiflix.de\",\r\n    \"password\":\"{{randomPassword}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/login",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Token Validation",
+			"item": [
+				{
+					"name": "Valid Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status Code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Correct Message\", function () {\r",
+									"    pm.response.to.have.body('{\"status\": \"Healthy\"}');\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Token",
+								"value": "{{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/secure/my_status",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"secure",
+								"my_status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Expired Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status Code is 401\", function() {\r",
+									"    pm.response.to.have.status(401);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Correct Message\", function () {\r",
+									"    pm.response.to.have.body('{\"message\":\"JWT Token Expired\"}\\n');\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Token",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjI3MTA4MzUsImlhdCI6MTYyMjcxMDc3NsdfsdWthczJAbHVrYXMuZGUifQ.hxXpTy9y3iYCwPG1J0Mzvv69XWnxWGM1UqZkXTtVs3c",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/secure/my_status",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"secure",
+								"my_status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Modified Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status Code is 401\", function() {\r",
+									"    pm.response.to.have.status(401);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Correct Message\", function () {\r",
+									"    pm.response.to.have.body('{\"message\":\"JWT Token Expired\"}\\n');\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Token",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjI3MTA4MzUsImlhdCI6MTYyMjcxMDc3NSwiaXNzIjoiYXB0LmFzY2lpZmxpeC50ZWNoIiwiVXNlcl9JRCI6MTIsIlVzZXJfZW1haWwiOiJsdWthczJAbHVrYXMuZGUifQ.hxXpTy9y3iYCwPG1J0Mzvv69XWnxWGM1UqZkXTtVs3c",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/secure/my_status",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"secure",
+								"my_status"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
 		{
 			"name": "API Health",
 			"event": [
