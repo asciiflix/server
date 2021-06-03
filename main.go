@@ -14,6 +14,6 @@ func main() {
 	fmt.Print("ASCIIflix Server ")
 	fmt.Println(config.Version)
 	config.GetConfig()
-	db := database.StartDatabase()
-	controller.StartRouter(db)
+	database.StartDatabase()
+	controller.StartRouter()
 }
