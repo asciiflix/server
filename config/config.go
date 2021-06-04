@@ -14,8 +14,14 @@ type DBConfig struct {
 	Port     string `mapstructure:"POSTGRES_PORT"`
 }
 
+type APIConfig struct {
+	Port   int    `mapstructure:"API_PORT"`
+	JWTKey string `mapstructure:"JWT_PRIVATE_KEY"`
+}
+
 var Version = "development"
 var Database DBConfig
+var ApiConfig APIConfig
 
 func GetConfig() {
 	viper.SetConfigName("config")
@@ -30,9 +36,10 @@ func GetConfig() {
 		fmt.Printf("Error reading config file, %s", err)
 	}
 
-	err = viper.Unmarshal(&Database)
+	err_db := viper.Unmarshal(&Database)
+	err_api := viper.Unmarshal(&ApiConfig)
 
-	if err != nil {
+	if err_db != nil || err_api != nil {
 		fmt.Printf("Unable to decode into struct, %v", err)
 	}
 

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/asciiflix/server/config"
 	"github.com/asciiflix/server/model"
@@ -38,7 +37,8 @@ func jwtCheck(next http.Handler) http.Handler {
 			return
 		}
 
-		mySigningKey := os.Getenv("JWT_PRIVATE_KEY")
+		//Get JWT-Private-Key
+		mySigningKey := config.ApiConfig.JWTKey
 
 		//Parse Incoming JWT Token. Token must be in the Header with the Key "Token"
 		token, err := jwt.ParseWithClaims(
