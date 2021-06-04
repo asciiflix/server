@@ -7,9 +7,6 @@ echo "Repo Cloned"
 echo "Starting Docker-Compose"
 cd ./server
 
-echo "Swichting to Master Branch"
-git switch master
-
 echo "Getting current tag"
 tag=$(git describe --tags `git rev-list --tags --max-count=1`)
 
