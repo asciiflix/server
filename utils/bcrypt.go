@@ -7,7 +7,7 @@ import (
 
 //Create a BCrypt Password, to store passwords in the database
 func GenerateBCryptFromPassword(user *model.User) (err error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
+	bytes, err := bcrypt.GenerateFromPassword([]byte(user.Password), 12)
 	if err != nil {
 		return err
 	} else {

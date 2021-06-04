@@ -3,7 +3,6 @@ package database
 import (
 	"fmt"
 	"net/url"
-	"time"
 
 	"github.com/asciiflix/server/config"
 	"github.com/asciiflix/server/model"
@@ -22,7 +21,7 @@ func StartDatabase() {
 		Path:     config.Database.Db,
 		RawQuery: (&url.Values{"sslmode": []string{"disable"}}).Encode(),
 	}
-	time.Sleep(5 * time.Second)
+
 	db, err := gorm.Open(postgres.Open(dsn.String()), &gorm.Config{})
 	if err != nil {
 		panic("Can't connect to database!")
