@@ -9,11 +9,13 @@ import (
 	"github.com/asciiflix/server/model"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
+	"github.com/sirupsen/logrus"
 )
 
 func initHandler(router *mux.Router) {
 
 	//Public Endpoints
+	router.Use(logRequests)
 	router.Path("/").HandlerFunc(home).Methods(http.MethodGet)
 	router.Path("/status").HandlerFunc(status).Methods(http.MethodGet)
 	router.Path("/register").HandlerFunc(register).Methods(http.MethodPost)
@@ -22,8 +24,21 @@ func initHandler(router *mux.Router) {
 	//Secure (JWT) Endpoints
 	protected := router.PathPrefix("/secure").Subrouter()
 	protected.Use(jwtCheck)
+	protected.Use(logRequests)
 	protected.Path("/my_status").HandlerFunc(status).Methods(http.MethodGet)
 
+}
+
+func logRequests(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		//Log Incoming Requests to Logger
+		config.Log.WithFields(logrus.Fields{
+			"endpoint": r.URL.Path,
+			"ip":       r.RemoteAddr,
+		}).Trace("New Request")
+
+		next.ServeHTTP(w, r)
+	})
 }
 
 //Check JWT Token for User Authentication
@@ -59,7 +74,13 @@ func jwtCheck(next http.Handler) http.Handler {
 
 		//Not Checking for errors in claims
 		if claims, _ := token.Claims.(*model.UserClaim); token.Valid {
-			fmt.Println("email:", claims.User_email, " // id:", claims.User_ID)
+
+			//Log JWT-Sample-Payload for testing
+			config.Log.WithFields(logrus.Fields{
+				"user_email": claims.User_email,
+				"user_id":    claims.User_ID,
+			}).Trace("JWT-Payload")
+
 			next.ServeHTTP(w, r)
 			return
 		}

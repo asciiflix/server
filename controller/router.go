@@ -1,16 +1,16 @@
 package controller
 
 import (
-	"fmt"
-	"log"
 	"net/http"
+	"strconv"
 
+	"github.com/asciiflix/server/config"
 	"github.com/gorilla/mux"
 )
 
 func StartRouter() {
 	r := mux.NewRouter()
 	initHandler(r)
-	fmt.Println("Starting API")
-	log.Fatal(http.ListenAndServe(":8080", r))
+	config.Log.Info("Starting API on Port ", config.ApiConfig.Port)
+	config.Log.Fatal(http.ListenAndServe(":"+strconv.Itoa(config.ApiConfig.Port), r))
 }

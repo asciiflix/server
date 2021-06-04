@@ -15,8 +15,9 @@ type DBConfig struct {
 }
 
 type APIConfig struct {
-	Port   int    `mapstructure:"API_PORT"`
-	JWTKey string `mapstructure:"JWT_PRIVATE_KEY"`
+	Port     int    `mapstructure:"API_PORT"`
+	JWTKey   string `mapstructure:"JWT_PRIVATE_KEY"`
+	LogLevel int    `mapstructure:"LOG_LEVEL"`
 }
 
 var Version = "development"
