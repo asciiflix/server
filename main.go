@@ -3,12 +3,18 @@ package main
 import (
 	"fmt"
 
-	api "github.com/asciiflix/server/api"
-	"github.com/asciiflix/server/storage"
+	"github.com/asciiflix/server/config"
+	"github.com/asciiflix/server/controller"
+	"github.com/asciiflix/server/database"
 )
 
+var Version string
+
 func main() {
-	fmt.Println("ASCIIflix Server")
-	db := storage.StartDatabase()
-	api.StartRouter(db)
+	fmt.Print("ASCIIflix Server ")
+	fmt.Println(config.Version)
+	config.GetConfig()
+	config.InitLogging()
+	database.StartDatabase()
+	controller.StartRouter()
 }

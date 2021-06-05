@@ -1,13 +1,28 @@
 # ACIIflix Server
 
-## Development
-To start up and run the application with your newest changes, without debugging capabilities, run:
+## Building
+
+If you want to build your own container image simply use the docker-compose file:
+
 ```bash
-sudo docker-compose up -d --build
+docker-compose build --build-arg VERSION=YOURVERSION
 ```
 
-If you want to run the application with a debugger, you first have to change the build target (of the go application server) from prod to debug. ``target: prod`` -> ``target: debug``
+## Deployment
 
-Then start the docker containers as explained above. When you start the debugging container, this only opens up the delve debugger. To start the application, open up a debugging session.
+If you want to start this app on your own server, you can simply start the docker-compose file:
 
-If you are using vscode, use the run config supplied in [./.vscode/lauch.json](./.vscode/lauch.json). With other IDEs, such as Goland, open up a remote debugging session at port ``2345``.
+```bash
+docker-compose up -d
+```
+
+The ASCIIflix Server will listen on port 8080 with the default settings.
+
+## Development
+
+To start and run the application with your newest changes and debugging capabilities, you can simply open this project in VSCode with the .devcontainer configs. <br>
+Of course you have to install docker on your dev host. After installing docker you can enter the Container Mode:
+
+1. Press `CTRL + SHIFT + P`
+2. Type `Remote-Containers: Reopen in Container`, but keep in mind your current VSCode project should be the asciiflix server project
+3. VSCode will download a docker image, this can take some minutes. After the download is finished, VSCode reopens the project in a docker-container. Now you can develop, debug and do some dev stuff..

@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+  workspace:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ..:/workspace:cached
+    environment:
+    - POSTGRES_HOST=database
+    - POSTGRES_PORT=5432
+    - POSTGRES_DB=asciiflix_db
+    - POSTGRES_USER=asciiflix
+    - POSTGRES_PASSWORD=asciiflixpassword
+    command: /bin/zsh -c "while sleep 1000; do :; done"
+  database:
+    image: postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=asciiflix_db
+      - POSTGRES_USER=asciiflix
+      - POSTGRES_PASSWORD=asciiflixpassword
+      - API_PORT=8080
+      - LOG_LEVEL=6
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+
+volumes:
+  postgres-data:
