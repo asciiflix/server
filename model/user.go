@@ -10,6 +10,9 @@ type User struct {
 	Name     string
 	Email    string
 	Password string
+	Videos   []Video
+	Comments []Comment
+	Likes    []Like
 }
 
 //Login Struct
