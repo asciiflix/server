@@ -7,9 +7,11 @@ import (
 	"os"
 
 	"github.com/asciiflix/server/config"
+	"github.com/asciiflix/server/database"
 	"github.com/asciiflix/server/model"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 func initHandler(router *mux.Router) {
@@ -19,12 +21,24 @@ func initHandler(router *mux.Router) {
 	router.Path("/status").HandlerFunc(status).Methods(http.MethodGet)
 	router.Path("/register").HandlerFunc(register).Methods(http.MethodPost)
 	router.Path("/login").HandlerFunc(login).Methods(http.MethodPost)
+	router.Path("/vapi/getVideo").HandlerFunc(testFuncDeleteMePlease).Methods(http.MethodGet, http.MethodPost)
 
 	//Secure (JWT) Endpoints
 	protected := router.PathPrefix("/secure").Subrouter()
 	protected.Use(jwtCheck)
 	protected.Path("/my_status").HandlerFunc(status).Methods(http.MethodGet)
 
+}
+
+func testFuncDeleteMePlease(w http.ResponseWriter, r *http.Request) {
+	databases, _ := database.Global_mongo_client.ListDatabaseNames(database.Global_mongo_context, bson.D{})
+	w.Write([]byte(fmt.Sprintln(databases)))
+}
+
+func panicWhenErr(err error) {
+	if err != nil {
+		panic(err)
+	}
 }
 
 //Check JWT Token for User Authentication

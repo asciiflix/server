@@ -13,7 +13,18 @@ services:
     - POSTGRES_DB=asciiflix_db
     - POSTGRES_USER=asciiflix
     - POSTGRES_PASSWORD=asciiflixpassword
+    - MONGODB_URI=mongodb://root:fucking_change_this_to_env_file@video_storage:27017
     command: /bin/zsh -c "while sleep 1000; do :; done"
+  video_storage:
+    image: mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: fucking_change_this_to_env_file
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - 27017:27017
   database:
     image: postgres
     restart: unless-stopped
@@ -27,3 +38,4 @@ services:
 
 volumes:
   postgres-data:
+  mongo-data:

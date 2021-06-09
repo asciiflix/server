@@ -12,6 +12,14 @@ services:
       - backend
     volumes:
       - data:/var/lib/postgresql/data
+      video_storage:
+        image: mongo
+        restart: unless-stopped
+        environment:
+          MONGO_INITDB_ROOT_USERNAME: root
+          MONGO_INITDB_ROOT_PASSWORD: fucking_change_this_to_env_file
+        volumes:
+          - mongo-data:/data/db
   server:
     build:
       context: .
@@ -41,6 +49,7 @@ services:
 
 volumes:
   data:
+  mongo-data:
 networks:
   backend:
   proxy:

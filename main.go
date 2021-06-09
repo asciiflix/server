@@ -15,5 +15,6 @@ func main() {
 	fmt.Println(config.Version)
 	config.GetConfig()
 	database.StartDatabase()
+	database.ConnectToMongo()
 	controller.StartRouter()
 }
