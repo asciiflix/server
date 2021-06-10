@@ -35,4 +35,5 @@ func StartDatabase() {
 	global_db = db
 
 	db.AutoMigrate(&model.User{})
+	db.AutoMigrate(&model.Video{})
 }

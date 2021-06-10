@@ -23,6 +23,8 @@ func initHandler(router *mux.Router) {
 	router.Path("/register").HandlerFunc(register).Methods(http.MethodPost)
 	router.Path("/login").HandlerFunc(login).Methods(http.MethodPost)
 	router.Path("/vapi/getVideo").HandlerFunc(testFuncDeleteMePlease).Methods(http.MethodGet, http.MethodPost)
+	//For Testing
+	router.Path("/createVideo").HandlerFunc(createVideo).Methods(http.MethodGet)
 
 	//Secure (JWT) Endpoints
 	protected := router.PathPrefix("/secure").Subrouter()
@@ -30,6 +32,11 @@ func initHandler(router *mux.Router) {
 	protected.Use(logRequests)
 	protected.Path("/my_status").HandlerFunc(status).Methods(http.MethodGet)
 
+}
+
+//PLS DELETE LATER JUST FOR UUID TESTING
+func createVideo(w http.ResponseWriter, r *http.Request) {
+	database.CreateVideo()
 }
 
 func testFuncDeleteMePlease(w http.ResponseWriter, r *http.Request) {

@@ -24,7 +24,7 @@ func RegisterUser(user model.User) map[string]interface{} {
 	}
 
 	//Register User in DB
-	global_db.Save(&user)
+	global_db.Create(&user)
 	return map[string]interface{}{"message": "User successfully registered."}
 }
 
