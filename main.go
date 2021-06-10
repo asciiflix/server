@@ -14,6 +14,7 @@ func main() {
 	fmt.Print("ASCIIflix Server ")
 	fmt.Println(config.Version)
 	config.GetConfig()
+	config.InitLogging()
 	database.StartDatabase()
 	database.ConnectToMongo()
 	controller.StartRouter()

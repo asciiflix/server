@@ -3,12 +3,12 @@ package database
 import (
 	"fmt"
 	"net/url"
-	"time"
 
 	"github.com/asciiflix/server/config"
 	"github.com/asciiflix/server/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 var global_db *gorm.DB
@@ -22,12 +22,16 @@ func StartDatabase() {
 		Path:     config.Database.Db,
 		RawQuery: (&url.Values{"sslmode": []string{"disable"}}).Encode(),
 	}
-	time.Sleep(5 * time.Second)
-	db, err := gorm.Open(postgres.Open(dsn.String()), &gorm.Config{})
+
+	db, err := gorm.Open(postgres.Open(dsn.String()), &gorm.Config{
+		//Disabling any log output from gorm
+		Logger: logger.Default.LogMode(logger.Silent),
+	})
+
 	if err != nil {
 		panic("Can't connect to database!")
 	}
-	fmt.Println("DB Connected")
+	config.Log.Info("DB Connected")
 	global_db = db
 
 	db.AutoMigrate(&model.User{})

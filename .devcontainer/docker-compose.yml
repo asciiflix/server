@@ -32,6 +32,8 @@ services:
       - POSTGRES_DB=asciiflix_db
       - POSTGRES_USER=asciiflix
       - POSTGRES_PASSWORD=asciiflixpassword
+      - API_PORT=8080
+      - LOG_LEVEL=6
     volumes:
       - postgres-data:/var/lib/postgresql/data
 

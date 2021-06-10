@@ -1,9 +1,9 @@
 package database
 
 import (
-	"os"
 	"time"
 
+	"github.com/asciiflix/server/config"
 	"github.com/asciiflix/server/model"
 	"github.com/asciiflix/server/utils"
 	"github.com/dgrijalva/jwt-go"
@@ -55,7 +55,8 @@ func LoginUser(login_data model.UserLogin) map[string]interface{} {
 	}
 
 	//Sign Token with Key
-	mySigningKey := os.Getenv("JWT_PRIVATE_KEY")
+	//Get JWT-Private-Key
+	mySigningKey := config.ApiConfig.JWTKey
 	jwtToken := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), jwtClaim)
 	token, err := jwtToken.SignedString([]byte(mySigningKey))
 
