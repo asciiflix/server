@@ -517,6 +517,45 @@
 					"response": []
 				},
 				{
+					"name": "Video Content - Get No ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status Code is 400\", function() {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"var jsonData = JSON.parse(responseBody);\r",
+									"\r",
+									"\r",
+									"pm.test(\"Correct Message\", function () {\r",
+									"    pm.expect(jsonData.message).to.equal(\"No ID in parameters\")\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/video/getContent",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"video",
+								"getContent"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Video Content - Delete",
 					"event": [
 						{
@@ -618,6 +657,52 @@
 									"key": "id",
 									"value": "{{videoContentID}}"
 								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Video Content - Delete No ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status Code is 400\", function() {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"var jsonData = JSON.parse(responseBody);\r",
+									"\r",
+									"\r",
+									"pm.test(\"Correct Message\", function () {\r",
+									"    pm.expect(jsonData.message).to.equal(\"No ID in parameters\")\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Token",
+								"value": "{{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/secure/video/deleteContent",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"secure",
+								"video",
+								"deleteContent"
 							]
 						}
 					},

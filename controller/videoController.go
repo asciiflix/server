@@ -2,9 +2,10 @@ package controller
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"net/http"
 
+	"github.com/asciiflix/server/config"
 	"github.com/asciiflix/server/database"
 	"github.com/asciiflix/server/model"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -37,10 +38,16 @@ func getVideoContent(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	//Getting ID from HTTP Parameters
-	param_id := r.URL.Query()["id"]
-	contentID, err := primitive.ObjectIDFromHex(param_id[0])
+	var param_id string
+	param_id, err := getIDFromParameters(w, r)
+
 	if err != nil {
-		fmt.Println(err)
+		return
+	}
+
+	contentID, err := primitive.ObjectIDFromHex(param_id)
+	if err != nil {
+		config.Log.Error(err)
 	} else {
 		//DAO Error Handling
 		result := database.GetVideoContent(contentID)
@@ -60,10 +67,16 @@ func deleteVideoContent(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	//Getting ID from HTTP Parameters
-	param_id := r.URL.Query()["id"]
-	contentID, err := primitive.ObjectIDFromHex(param_id[0])
+	var param_id string
+	param_id, err := getIDFromParameters(w, r)
+
 	if err != nil {
-		fmt.Println(err)
+		return
+	}
+
+	contentID, err := primitive.ObjectIDFromHex(param_id)
+	if err != nil {
+		config.Log.Error(err)
 	} else {
 		//DAO Error Handling
 		result := database.DeleteVideoContent(contentID)
@@ -77,4 +90,16 @@ func deleteVideoContent(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(result)
 	}
 
+}
+
+func getIDFromParameters(w http.ResponseWriter, r *http.Request) (id string, err error) {
+	param_id := r.URL.Query()["id"]
+
+	if len(param_id) < 1 {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{"message": "No ID in parameters"})
+		return "", errors.New("no id in param")
+	}
+
+	return param_id[0], nil
 }
