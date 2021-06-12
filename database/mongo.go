@@ -30,13 +30,14 @@ func ConnectToMongo() {
 	panicWhenErr(err)
 
 	//Context
-	Global_mongo_context, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	Global_mongo_context, cancell_ctx := context.WithTimeout(context.Background(), 10*time.Second)
 
 	err = global_mongo_client.Connect(Global_mongo_context)
 	panicWhenErr(err)
 	// defer client.Disconnect(Global_mongo_context)
-	//panicWhenErr(err)
+	
 	config.Log.Info("Connected to MongoDB")
+	cancell_ctx();
 }
 
 func panicWhenErr(err error) {
