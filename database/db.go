@@ -31,8 +31,9 @@ func StartDatabase() {
 	if err != nil {
 		panic("Can't connect to database!")
 	}
-	config.Log.Info("DB Connected")
+	config.Log.Info("Connected to DB")
 	global_db = db
 
 	db.AutoMigrate(&model.User{})
+	db.AutoMigrate(&model.VideoStats{})
 }

@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/asciiflix/server/config"
+	"github.com/asciiflix/server/database"
 	"github.com/asciiflix/server/model"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
@@ -20,13 +21,25 @@ func initHandler(router *mux.Router) {
 	router.Path("/status").HandlerFunc(status).Methods(http.MethodGet)
 	router.Path("/register").HandlerFunc(register).Methods(http.MethodPost)
 	router.Path("/login").HandlerFunc(login).Methods(http.MethodPost)
+	//Video-Content
+	router.Path("/video/getContent").HandlerFunc(getVideoContent).Methods(http.MethodGet)
+	//For Testing-ID-System
+	router.Path("/createVideo").HandlerFunc(createVideo).Methods(http.MethodGet)
 
 	//Secure (JWT) Endpoints
 	protected := router.PathPrefix("/secure").Subrouter()
 	protected.Use(jwtCheck)
 	protected.Use(logRequests)
 	protected.Path("/my_status").HandlerFunc(status).Methods(http.MethodGet)
+	//Video-Content
+	protected.Path("/video/createContent").HandlerFunc(createVideoContent).Methods(http.MethodPost)
+	protected.Path("/video/deleteContent").HandlerFunc(deleteVideoContent).Methods(http.MethodDelete)
 
+}
+
+//PLS DELETE LATER JUST FOR UUID TESTING
+func createVideo(w http.ResponseWriter, r *http.Request) {
+	database.CreateVideo()
 }
 
 func logRequests(next http.Handler) http.Handler {
