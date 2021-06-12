@@ -13,6 +13,6 @@ type VideoStats struct {
 }
 
 type VideoContent struct {
-	ID    primitive.ObjectID `bson:"_id,omitempty"`
-	Video interface{}        `bson:"video"`
+	ID    primitive.ObjectID     `bson:"_id,omitempty"`
+	Video map[string]interface{} `bson:"video"`
 }

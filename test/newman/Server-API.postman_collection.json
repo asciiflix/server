@@ -392,6 +392,284 @@
 			]
 		},
 		{
+			"name": "Video - Content",
+			"item": [
+				{
+					"name": "Video Content - Create",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status Code is 201\", function() {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"var jsonData = JSON.parse(responseBody);\r",
+									"\r",
+									"pm.test(\"Recieving ContentID\", function () {\r",
+									"    pm.globals.set(\"videoContentID\", jsonData._id);\r",
+									"    pm.expect(jsonData._id).to.exist\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Correct Message\", function () {\r",
+									"    pm.expect(jsonData.message).to.equal(\"Successfully created VideoContent\")\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.globals.set(\"videoContent\", pm.request.body.raw);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Token",
+								"value": "{{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Video\": {\r\n        \"Rows\": [\r\n        \"______\",\r\n        \"|----|\",\r\n        \"|----|\",\r\n        \"______\"\r\n        ],\r\n        \"height\": 4,\r\n        \"width\": 6\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/secure/video/createContent",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"secure",
+								"video",
+								"createContent"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Video Content - Get",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status Code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"var jsonData = JSON.parse(responseBody);\r",
+									"var savedJson = JSON.parse(pm.globals.get(\"videoContent\"))\r",
+									"\r",
+									"pm.test(\"Recieving Correct Content\", function () {\r",
+									"    pm.expect(jsonData.content.Video).to.eql(savedJson.Video)\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Recieving Correct ID\", function () {\r",
+									"    pm.expect(jsonData.content.ID).to.equal(pm.globals.get(\"videoContentID\"))\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Correct Message\", function () {\r",
+									"    pm.expect(jsonData.message).to.equal(\"Successfully found VideoContent by ID\")\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/video/getContent?id={{videoContentID}}",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"video",
+								"getContent"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{videoContentID}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Video Content - Delete",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status Code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"var jsonData = JSON.parse(responseBody);\r",
+									"\r",
+									"pm.test(\"Correct Message\", function () {\r",
+									"    pm.expect(jsonData.message).to.equal(\"Successfully deleted VideoContent by ID\")\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Correct Result\", function () {\r",
+									"    pm.expect(jsonData.result.DeletedCount).to.equal(1)\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Token",
+								"value": "{{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/secure/video/deleteContent?id={{videoContentID}}",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"secure",
+								"video",
+								"deleteContent"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{videoContentID}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Video Content - Delete Non Existing",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status Code is 404\", function() {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"var jsonData = JSON.parse(responseBody);\r",
+									"\r",
+									"pm.test(\"Correct Message\", function () {\r",
+									"    pm.expect(jsonData.message).to.equal(\"ID does not exist.\")\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Token",
+								"value": "{{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/secure/video/deleteContent?id={{videoContentID}}",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"secure",
+								"video",
+								"deleteContent"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{videoContentID}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Video Content - Get Non Existing",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status Code is 404\", function() {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"var jsonData = JSON.parse(responseBody);\r",
+									"\r",
+									"pm.test(\"Correct Message\", function () {\r",
+									"    pm.expect(jsonData.message).to.equal(\"ID does not exist.\")\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/video/getContent?id={{videoContentID}}",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"video",
+								"getContent"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{videoContentID}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "API Health",
 			"event": [
 				{

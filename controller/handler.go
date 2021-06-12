@@ -22,11 +22,8 @@ func initHandler(router *mux.Router) {
 	router.Path("/register").HandlerFunc(register).Methods(http.MethodPost)
 	router.Path("/login").HandlerFunc(login).Methods(http.MethodPost)
 	//Video-Content
-	router.Path("/video/createContent").HandlerFunc(createVideoContent).Methods(http.MethodPost)
 	router.Path("/video/getContent").HandlerFunc(getVideoContent).Methods(http.MethodGet)
-	router.Path("/video/deleteContent").HandlerFunc(deleteVideoContent).Methods(http.MethodDelete)
-
-	//For Testing
+	//For Testing-ID-System
 	router.Path("/createVideo").HandlerFunc(createVideo).Methods(http.MethodGet)
 
 	//Secure (JWT) Endpoints
@@ -34,6 +31,9 @@ func initHandler(router *mux.Router) {
 	protected.Use(jwtCheck)
 	protected.Use(logRequests)
 	protected.Path("/my_status").HandlerFunc(status).Methods(http.MethodGet)
+	//Video-Content
+	protected.Path("/video/createContent").HandlerFunc(createVideoContent).Methods(http.MethodPost)
+	protected.Path("/video/deleteContent").HandlerFunc(deleteVideoContent).Methods(http.MethodDelete)
 
 }
 
