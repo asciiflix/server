@@ -11,7 +11,6 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 func initHandler(router *mux.Router) {
@@ -22,7 +21,11 @@ func initHandler(router *mux.Router) {
 	router.Path("/status").HandlerFunc(status).Methods(http.MethodGet)
 	router.Path("/register").HandlerFunc(register).Methods(http.MethodPost)
 	router.Path("/login").HandlerFunc(login).Methods(http.MethodPost)
-	router.Path("/vapi/getVideo").HandlerFunc(testFuncDeleteMePlease).Methods(http.MethodGet, http.MethodPost)
+	//Video-Content
+	router.Path("/video/createContent").HandlerFunc(createVideoContent).Methods(http.MethodPost)
+	router.Path("/video/getContent").HandlerFunc(getVideoContent).Methods(http.MethodGet)
+	router.Path("/video/deleteContent").HandlerFunc(deleteVideoContent).Methods(http.MethodDelete)
+
 	//For Testing
 	router.Path("/createVideo").HandlerFunc(createVideo).Methods(http.MethodGet)
 
@@ -37,17 +40,6 @@ func initHandler(router *mux.Router) {
 //PLS DELETE LATER JUST FOR UUID TESTING
 func createVideo(w http.ResponseWriter, r *http.Request) {
 	database.CreateVideo()
-}
-
-func testFuncDeleteMePlease(w http.ResponseWriter, r *http.Request) {
-	databases, _ := database.Global_mongo_client.ListDatabaseNames(database.Global_mongo_context, bson.D{})
-	w.Write([]byte(fmt.Sprintln(databases)))
-}
-
-func panicWhenErr(err error) {
-	if err != nil {
-		panic(err)
-	}
 }
 
 func logRequests(next http.Handler) http.Handler {
