@@ -31,10 +31,11 @@ func StartDatabase() {
 	if err != nil {
 		panic("Can't connect to database!")
 	}
-	config.Log.Info("DB Connected")
+	config.Log.Info("Connected to DB")
 	global_db = db
 
 	db.AutoMigrate(&model.User{}, &model.Video{}, &model.Comment{}, &model.Like{})
+	db.AutoMigrate(&model.VideoStats{})
 	db.Create(&model.User{
 		Name:     "Bob",
 		Email:    "test@gmail.com",
