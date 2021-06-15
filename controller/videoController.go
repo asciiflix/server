@@ -47,6 +47,8 @@ func getVideoContent(w http.ResponseWriter, r *http.Request) {
 
 	contentID, err := primitive.ObjectIDFromHex(param_id)
 	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]interface{}{"message": "ID does not exist."})
 		config.Log.Error(err)
 	} else {
 		//DAO Error Handling
