@@ -20,6 +20,11 @@ func initHandler(router *mux.Router) {
 	router.Path("/status").HandlerFunc(status).Methods(http.MethodGet)
 	router.Path("/register").HandlerFunc(register).Methods(http.MethodPost)
 	router.Path("/login").HandlerFunc(login).Methods(http.MethodPost)
+	router.Path("/videos").HandlerFunc(getVideos).Methods(http.MethodGet)
+	router.Path("/video/{id}").HandlerFunc(getVideo).Methods(http.MethodGet)
+	router.Path("/video/{id}").HandlerFunc(deleteVideo).Methods(http.MethodDelete)
+	router.Path("/video/{id}").HandlerFunc(updateVideo).Methods(http.MethodPut)
+	router.Path("/video/create").HandlerFunc(createVideo).Methods(http.MethodPost)
 
 	//Secure (JWT) Endpoints
 	protected := router.PathPrefix("/secure").Subrouter()

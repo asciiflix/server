@@ -34,5 +34,20 @@ func StartDatabase() {
 	config.Log.Info("DB Connected")
 	global_db = db
 
-	db.AutoMigrate(&model.User{})
+	db.AutoMigrate(&model.User{}, &model.Video{}, &model.Comment{}, &model.Like{})
+	db.Create(&model.User{
+		Name:     "Bob",
+		Email:    "test@gmail.com",
+		Password: "afsdfsadf",
+		Videos: []model.Video{
+			{
+				Name:        "Video1",
+				Description: "Description",
+				Comments:    nil,
+				Likes:       nil,
+			},
+		},
+		Comments: nil,
+		Likes:    nil,
+	})
 }
