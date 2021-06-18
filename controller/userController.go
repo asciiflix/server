@@ -56,3 +56,142 @@ func login(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(result)
 	}
 }
+
+//Get User Information by ID
+func getUser(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	//Get ID from params
+	user_ID, err := getIDFromParameters(w, r)
+	if err != nil {
+		return
+	}
+
+	//Get User from DB
+	user, err := database.GetUser(user_ID)
+	if err != nil {
+		basicUserErrorHandler(err, w)
+		return
+	}
+
+	//Response
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(user)
+}
+
+//Get PrivateUser Information by ID
+func getPrivateUser(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	//Get ID from params
+	user_ID, err := getIDFromParameters(w, r)
+	if err != nil {
+		return
+	}
+
+	//Checking JWT, because there are private information like: email, likes, comments etc.
+	err = checkJWT(user_ID, r)
+	if err != nil {
+		basicUserErrorHandler(err, w)
+		return
+	}
+
+	//Getting Information from DB
+	user, err := database.GetPrivateUser(user_ID)
+	if err != nil {
+		basicUserErrorHandler(err, w)
+		return
+	}
+
+	//Response
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(user)
+
+}
+
+//Update User Information
+func updateUser(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	//Get ID from params
+	user_ID, err := getIDFromParameters(w, r)
+	if err != nil {
+		return
+	}
+
+	//Checking JWT
+	err = checkJWT(user_ID, r)
+	if err != nil {
+		basicUserErrorHandler(err, w)
+		return
+	}
+
+	//Getting User-Data from Request, to change that in the db
+	var user model.User
+	err = json.NewDecoder(r.Body).Decode(&user)
+	if err != nil {
+		basicUserErrorHandler(err, w)
+		return
+	}
+
+	//Parsing ID into User Object
+	user.ID, err = parseStringToUint(user_ID)
+	if err != nil {
+		basicUserErrorHandler(err, w)
+		return
+	}
+
+	//Update User in DB
+	err = database.UpdateUser(&user)
+	if err != nil {
+		basicUserErrorHandler(err, w)
+		return
+	}
+
+	//Response
+	w.WriteHeader(http.StatusAccepted)
+}
+
+//Delete User by ID
+func deleteUser(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	//Getting ID from HTTP-Parameters
+	user_ID, err := getIDFromParameters(w, r)
+	if err != nil {
+		return
+	}
+
+	//Checking JWT
+	err = checkJWT(user_ID, r)
+	if err != nil {
+		basicUserErrorHandler(err, w)
+		return
+	}
+
+	//Deleting User by ID in DB
+	err = database.DeleteUser(user_ID)
+	if err != nil {
+		basicUserErrorHandler(err, w)
+		return
+	}
+
+	//Response
+	w.WriteHeader(http.StatusNoContent)
+}
+
+//Get all Users
+func getAllUsers(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	//Get all Users from DB
+	users, err := database.GetAllUsers()
+	if err != nil {
+		basicUserErrorHandler(err, w)
+		return
+	}
+
+	//Sending Response
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(users)
+}

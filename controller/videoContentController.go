@@ -2,7 +2,6 @@ package controller
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 
 	"github.com/asciiflix/server/config"
@@ -91,16 +90,4 @@ func deleteVideoContent(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(result)
 	}
 
-}
-
-func getIDFromParameters(w http.ResponseWriter, r *http.Request) (id string, err error) {
-	param_id := r.URL.Query()["id"]
-
-	if len(param_id) < 1 {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]interface{}{"message": "No ID in parameters"})
-		return "", errors.New("no id in param")
-	}
-
-	return param_id[0], nil
 }
