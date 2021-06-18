@@ -20,6 +20,7 @@ type User struct {
 
 //UserDetails fpr Private Endpoints (Settings etc.)
 type UserDetailsPrivate struct {
+	UserID      uint
 	Name        string
 	Email       string
 	Description string
@@ -31,6 +32,7 @@ type UserDetailsPrivate struct {
 
 //UserDetails for Public Endpoints (Profile Page etc)
 type UserDetailsPublic struct {
+	UserID      uint
 	Name        string
 	Description string
 	Picture_ID  string

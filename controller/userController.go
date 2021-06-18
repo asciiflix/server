@@ -7,6 +7,7 @@ import (
 	"github.com/asciiflix/server/database"
 	"github.com/asciiflix/server/model"
 	"github.com/asciiflix/server/utils"
+	"github.com/gorilla/mux"
 )
 
 //Register user
@@ -63,10 +64,7 @@ func getUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	//Get ID from params
-	user_ID, err := getIDFromParameters(w, r)
-	if err != nil {
-		return
-	}
+	user_ID := mux.Vars(r)["id"]
 
 	//Get User from DB
 	user, err := database.GetUser(user_ID)
@@ -85,13 +83,10 @@ func getPrivateUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	//Get ID from params
-	user_ID, err := getIDFromParameters(w, r)
-	if err != nil {
-		return
-	}
+	user_ID := mux.Vars(r)["id"]
 
 	//Checking JWT, because there are private information like: email, likes, comments etc.
-	err = checkJWT(user_ID, r)
+	err := checkJWT(user_ID, r)
 	if err != nil {
 		basicUserErrorHandler(err, w)
 		return
@@ -115,13 +110,10 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	//Get ID from params
-	user_ID, err := getIDFromParameters(w, r)
-	if err != nil {
-		return
-	}
+	user_ID := mux.Vars(r)["id"]
 
 	//Checking JWT
-	err = checkJWT(user_ID, r)
+	err := checkJWT(user_ID, r)
 	if err != nil {
 		basicUserErrorHandler(err, w)
 		return
@@ -157,14 +149,11 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 func deleteUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	//Getting ID from HTTP-Parameters
-	user_ID, err := getIDFromParameters(w, r)
-	if err != nil {
-		return
-	}
+	//Get ID from params
+	user_ID := mux.Vars(r)["id"]
 
 	//Checking JWT
-	err = checkJWT(user_ID, r)
+	err := checkJWT(user_ID, r)
 	if err != nil {
 		basicUserErrorHandler(err, w)
 		return

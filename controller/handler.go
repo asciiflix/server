@@ -25,7 +25,7 @@ func initHandler(router *mux.Router) {
 	router.Path("/video/{id}").HandlerFunc(updateVideo).Methods(http.MethodPut)
 	router.Path("/video/create").HandlerFunc(createVideo).Methods(http.MethodPost)
 	//User-Information
-	router.Path("/user/getUser").HandlerFunc(getUser).Methods(http.MethodGet)
+	router.Path("/user/getUser").Queries("id", "{id}").HandlerFunc(getUser).Methods(http.MethodGet)
 	router.Path("/user/getAllUsers").HandlerFunc(getAllUsers).Methods(http.MethodGet)
 
 	//Secure (JWT) Endpoints
@@ -37,9 +37,9 @@ func initHandler(router *mux.Router) {
 	protected.Path("/video/createContent").HandlerFunc(createVideoContent).Methods(http.MethodPost)
 	protected.Path("/video/deleteContent").HandlerFunc(deleteVideoContent).Methods(http.MethodDelete)
 	//User-Information
-	protected.Path("/user/getUser").HandlerFunc(getPrivateUser).Methods(http.MethodGet)
-	protected.Path("/user/updateUser").HandlerFunc(updateUser).Methods(http.MethodPut)
-	protected.Path("/user/deleteUser").HandlerFunc(deleteUser).Methods(http.MethodDelete)
+	protected.Path("/user/getUser").Queries("id", "{id}").HandlerFunc(getPrivateUser).Methods(http.MethodGet)
+	protected.Path("/user/updateUser").Queries("id", "{id}").HandlerFunc(updateUser).Methods(http.MethodPut)
+	protected.Path("/user/deleteUser").Queries("id", "{id}").HandlerFunc(deleteUser).Methods(http.MethodDelete)
 
 }
 

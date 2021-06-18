@@ -26,7 +26,9 @@ func RegisterUser(user model.User) map[string]interface{} {
 
 	//Register User in DB
 	global_db.Create(&user)
-	return map[string]interface{}{"message": "User successfully registered."}
+	response := map[string]interface{}{"message": "User successfully registered."}
+	response["id"] = user.ID
+	return response
 }
 
 //Login Function, search for Users in database an retrun a JWT Token
@@ -87,6 +89,7 @@ func GetUser(userID string) (*model.UserDetailsPublic, error) {
 
 	//Parsing Object
 	publicUser.Name = user.Name
+	publicUser.UserID = user.ID
 	publicUser.Description = user.Description
 	publicUser.Picture_ID = user.Picture_ID
 	publicUser.Videos = user.Videos
@@ -108,6 +111,7 @@ func GetPrivateUser(userID string) (*model.UserDetailsPrivate, error) {
 
 	//Parsing Object
 	privateUser.Name = user.Name
+	privateUser.UserID = user.ID
 	privateUser.Email = user.Email
 	privateUser.Description = user.Description
 	privateUser.Picture_ID = user.Picture_ID
