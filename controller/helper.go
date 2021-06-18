@@ -12,19 +12,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-//Get ID-Parameter from HTTP-Parameters and checks for errors (no id)
-func getIDFromParameters(w http.ResponseWriter, r *http.Request) (id string, err error) {
-	param_id := r.URL.Query()["id"]
-
-	if len(param_id) < 1 {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]interface{}{"message": "No ID in parameters"})
-		return "", errors.New("no id in param")
-	}
-
-	return param_id[0], nil
-}
-
 //Getting JWTClaims from Header without Validation
 func getJWTClaims(r *http.Request) (model.UserClaim, error) {
 	token, _, err := new(jwt.Parser).ParseUnverified(r.Header["Token"][0], &model.UserClaim{})

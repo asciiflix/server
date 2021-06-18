@@ -18,7 +18,7 @@ func initHandler(router *mux.Router) {
 	router.Path("/login").HandlerFunc(login).Methods(http.MethodPost)
 	router.Path("/videos").HandlerFunc(getVideos).Methods(http.MethodGet)
 	//Video-Content
-	router.Path("/video/getContent").HandlerFunc(getVideoContent).Methods(http.MethodGet)
+	router.Path("/video/getContent").Queries("id", "{id}").HandlerFunc(getVideoContent).Methods(http.MethodGet)
 	//Video-MetaData
 	router.Path("/video/{id}").HandlerFunc(getVideo).Methods(http.MethodGet)
 	router.Path("/video/{id}").HandlerFunc(deleteVideo).Methods(http.MethodDelete)
@@ -35,7 +35,7 @@ func initHandler(router *mux.Router) {
 	protected.Path("/my_status").HandlerFunc(status).Methods(http.MethodGet)
 	//Video-Content
 	protected.Path("/video/createContent").HandlerFunc(createVideoContent).Methods(http.MethodPost)
-	protected.Path("/video/deleteContent").HandlerFunc(deleteVideoContent).Methods(http.MethodDelete)
+	protected.Path("/video/deleteContent").Queries("id", "{id}").HandlerFunc(deleteVideoContent).Methods(http.MethodDelete)
 	//User-Information
 	protected.Path("/user/getUser").Queries("id", "{id}").HandlerFunc(getPrivateUser).Methods(http.MethodGet)
 	protected.Path("/user/updateUser").Queries("id", "{id}").HandlerFunc(updateUser).Methods(http.MethodPut)

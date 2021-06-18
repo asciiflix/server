@@ -7,6 +7,7 @@ import (
 	"github.com/asciiflix/server/config"
 	"github.com/asciiflix/server/database"
 	"github.com/asciiflix/server/model"
+	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -37,12 +38,7 @@ func getVideoContent(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	//Getting ID from HTTP Parameters
-	var param_id string
-	param_id, err := getIDFromParameters(w, r)
-
-	if err != nil {
-		return
-	}
+	param_id := mux.Vars(r)["id"]
 
 	contentID, err := primitive.ObjectIDFromHex(param_id)
 	if err != nil {
@@ -67,12 +63,7 @@ func deleteVideoContent(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	//Getting ID from HTTP Parameters
-	var param_id string
-	param_id, err := getIDFromParameters(w, r)
-
-	if err != nil {
-		return
-	}
+	param_id := mux.Vars(r)["id"]
 
 	contentID, err := primitive.ObjectIDFromHex(param_id)
 	if err != nil {
