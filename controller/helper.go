@@ -9,6 +9,7 @@ import (
 	"github.com/asciiflix/server/config"
 	"github.com/asciiflix/server/model"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/sirupsen/logrus"
 )
 
 //Get ID-Parameter from HTTP-Parameters and checks for errors (no id)
@@ -61,11 +62,48 @@ func checkJWT(userID string, r *http.Request) error {
 	return nil
 }
 
-//Parse string to uint (for user-id stuff)
-func parseStringToUint(toParse string) (uint, error) {
-	data, err := strconv.ParseUint(toParse, 10, 64)
-	if err != nil {
-		return 0, err
-	}
-	return uint(data), nil
+//Check JWT Token for User Authentication
+func jwtPreHandler(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		//Checking if there is an existent Header Key "Token"
+		if r.Header["Token"] == nil {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(map[string]interface{}{"message": "No JWT Token"})
+			return
+		}
+
+		//Get JWT-Private-Key
+		mySigningKey := config.ApiConfig.JWTKey
+
+		//Parse Incoming JWT Token. Token must be in the Header with the Key "Token"
+		token, err := jwt.ParseWithClaims(
+			r.Header["Token"][0],
+			&model.UserClaim{},
+			func(token *jwt.Token) (interface{}, error) {
+				return []byte(mySigningKey), nil
+			},
+		)
+
+		//Checking for JWT Parsing Errors like (Invalid JWT Token or if the Token is expired)
+		if err != nil {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(map[string]interface{}{"message": "JWT Token Expired"})
+			return
+		}
+
+		//Not Checking for errors in claims
+		if claims, _ := token.Claims.(*model.UserClaim); token.Valid {
+
+			//Log JWT-Sample-Payload for testing
+			config.Log.WithFields(logrus.Fields{
+				"user_email": claims.User_email,
+				"user_id":    claims.User_ID,
+			}).Trace("JWT-Payload")
+
+			next.ServeHTTP(w, r)
+			return
+		}
+	})
 }

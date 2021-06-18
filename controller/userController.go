@@ -6,6 +6,7 @@ import (
 
 	"github.com/asciiflix/server/database"
 	"github.com/asciiflix/server/model"
+	"github.com/asciiflix/server/utils"
 )
 
 //Register user
@@ -135,7 +136,7 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Parsing ID into User Object
-	user.ID, err = parseStringToUint(user_ID)
+	user.ID, err = utils.ParseStringToUint(user_ID)
 	if err != nil {
 		basicUserErrorHandler(err, w)
 		return
