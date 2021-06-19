@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "93138ced-4731-4b79-ad94-8c71e266effd",
+		"_postman_id": "9380a7c7-60de-42d8-a3fc-1c76b39216bb",
 		"name": "ASCIIflix - Server - API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -893,12 +893,6 @@
 									"pm.test(\"Status Code is 404\", function() {\r",
 									"    pm.response.to.have.status(404);\r",
 									"});\r",
-									"\r",
-									"var jsonData = JSON.parse(responseBody);\r",
-									"\r",
-									"pm.test(\"Correct Message\", function () {\r",
-									"    pm.expect(jsonData.message).to.equal(\"ID does not exist.\")\r",
-									"});\r",
 									""
 								],
 								"type": "text/javascript"
@@ -937,13 +931,7 @@
 									"pm.test(\"Status Code is 404\", function() {\r",
 									"    pm.response.to.have.status(404);\r",
 									"});\r",
-									"\r",
-									"var jsonData = JSON.parse(responseBody);\r",
-									"\r",
-									"\r",
-									"pm.test(\"Correct Message\", function () {\r",
-									"    pm.expect(jsonData.message).to.equal(\"No ID in parameters\")\r",
-									"});"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -1127,13 +1115,6 @@
 									"pm.test(\"Status Code is 404\", function() {\r",
 									"    pm.response.to.have.status(404);\r",
 									"});\r",
-									"\r",
-									"var jsonData = JSON.parse(responseBody);\r",
-									"\r",
-									"pm.test(\"Correct Message\", function () {\r",
-									"    pm.expect(jsonData.message).to.equal(\"ID does not exist.\")\r",
-									"});\r",
-									"\r",
 									""
 								],
 								"type": "text/javascript"
@@ -1176,16 +1157,10 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status Code is 400\", function() {\r",
-									"    pm.response.to.have.status(400);\r",
+									"pm.test(\"Status Code is 404\", function() {\r",
+									"    pm.response.to.have.status(404);\r",
 									"});\r",
 									"\r",
-									"var jsonData = JSON.parse(responseBody);\r",
-									"\r",
-									"\r",
-									"pm.test(\"Correct Message\", function () {\r",
-									"    pm.expect(jsonData.message).to.equal(\"No ID in parameters\")\r",
-									"});\r",
 									""
 								],
 								"type": "text/javascript"
