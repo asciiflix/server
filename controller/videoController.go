@@ -21,6 +21,7 @@ func getVideo(w http.ResponseWriter, r *http.Request) {
 	}
 	json.NewEncoder(w).Encode(video)
 }
+
 func getVideos(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	videos, err := database.GetVideos()
@@ -33,10 +34,10 @@ func getVideos(w http.ResponseWriter, r *http.Request) {
 
 func createVideo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	video := model.Video{}
+	videoFull := model.VideoFull{}
 
 	//Parse video from request body
-	err := json.NewDecoder(r.Body).Decode(&video)
+	err := json.NewDecoder(r.Body).Decode(&videoFull)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -44,12 +45,22 @@ func createVideo(w http.ResponseWriter, r *http.Request) {
 	claims, _ := getJWTClaims(r)
 
 	//Check if user is authorized
-	if claims.User_ID != video.UserID {
+	if claims.User_ID != videoFull.Video.UserID {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
+
+	//Create Video content
+	result := database.CreateVideoContent(&videoFull.VideoContent)
+	if result["message"] != "Successfully created VideoContent" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	videoFull.Video.VideoContentID = result["_id"].(string)
+
 	//Create Video
-	err = database.CreateVideo(video)
+	err = database.CreateVideo(videoFull.Video)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -59,6 +70,7 @@ func createVideo(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 
 }
+
 func updateVideo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)

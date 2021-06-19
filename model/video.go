@@ -25,3 +25,8 @@ type VideoContent struct {
 	ID    primitive.ObjectID     `bson:"_id,omitempty"`
 	Video map[string]interface{} `bson:"video"`
 }
+
+type VideoFull struct {
+	Video        Video
+	VideoContent VideoContent
+}
