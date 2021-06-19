@@ -2,6 +2,7 @@ package database
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/asciiflix/server/model"
 )
@@ -55,12 +56,16 @@ func UpdateVideo(updateVideo model.Video) error {
 }
 
 //Delete video by uuid
-func DeleteVideo(videoId string, userId string) error {
+func DeleteVideo(videoId string, userId uint) error {
 	//Check if video exists and belongs to user
-	result := global_db.Where("uuid = ? AND user_id = ?", videoId, userId).First(&model.Video{})
-	if result.Error != nil {
-		return result.Error
-
+	video, err := GetVideo(videoId)
+	if err != nil {
+		fmt.Println(videoId)
+		return err
+	}
+	if userId != video.UserID {
+		fmt.Println(videoId)
+		return errors.New("user does not match")
 	}
 	global_db.Where("uuid = ? AND user_id = ?", videoId, userId).Delete(&model.Video{})
 	return nil

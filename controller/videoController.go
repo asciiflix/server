@@ -6,7 +6,6 @@ import (
 
 	"github.com/asciiflix/server/database"
 	"github.com/asciiflix/server/model"
-	"github.com/asciiflix/server/utils"
 	"github.com/gofrs/uuid"
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -104,7 +103,7 @@ func deleteVideo(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	claims, _ := getJWTClaims(r)
 
-	err := database.DeleteVideo(params["id"], utils.ParseUintToString(claims.User_ID))
+	err := database.DeleteVideo(params["id"], claims.User_ID)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
