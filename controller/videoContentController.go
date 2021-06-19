@@ -37,8 +37,12 @@ func createVideoContent(w http.ResponseWriter, r *http.Request) {
 func getVideoContent(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	//Getting ID from HTTP Parameters
-	param_id := mux.Vars(r)["id"]
+	//Getting ContentID from UUID
+	param_id, err := database.GetContentID(mux.Vars(r)["id"])
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
 
 	contentID, err := primitive.ObjectIDFromHex(param_id)
 	if err != nil {

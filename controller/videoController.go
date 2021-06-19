@@ -9,6 +9,7 @@ import (
 	"github.com/asciiflix/server/utils"
 	"github.com/gofrs/uuid"
 	"github.com/gorilla/mux"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func getVideo(w http.ResponseWriter, r *http.Request) {
@@ -34,40 +35,40 @@ func getVideos(w http.ResponseWriter, r *http.Request) {
 
 func createVideo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	videoFull := model.VideoFull{}
+	video := model.VideoFull{}
 
 	//Parse video from request body
-	err := json.NewDecoder(r.Body).Decode(&videoFull)
+	err := json.NewDecoder(r.Body).Decode(&video)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
 		return
 	}
 	claims, _ := getJWTClaims(r)
 
-	//Check if user is authorized
-	if claims.User_ID != videoFull.Video.UserID {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
+	//Set User
+	video.VideoStats.UserID = claims.User_ID
 
 	//Create Video content
-	result := database.CreateVideoContent(&videoFull.VideoContent)
+	result := database.CreateVideoContent(&video.VideoContent)
 	if result["message"] != "Successfully created VideoContent" {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	video.VideoStats.VideoContentID = result["_id"].(primitive.ObjectID).Hex()
 
-	videoFull.Video.VideoContentID = result["_id"].(string)
-
+	video.VideoStats.UUID, _ = uuid.NewV4()
 	//Create Video
-	err = database.CreateVideo(videoFull.Video)
+	err = database.CreateVideo(video.VideoStats)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
 		return
 	}
 
 	//Response
 	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(map[string]interface{}{"videoID": video.VideoStats.UUID})
 
 }
 
@@ -81,11 +82,8 @@ func updateVideo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//Checking JWT
-	err = checkJWT(utils.ParseUintToString(video.UserID), r)
-	if err != nil {
-		basicVideoErrorHandler(err, w)
-		return
-	}
+	claims, _ := getJWTClaims(r)
+	video.UserID = claims.User_ID
 	//Parsing data
 	video.UUID, _ = uuid.FromString(params["id"])
 
@@ -108,10 +106,10 @@ func deleteVideo(w http.ResponseWriter, r *http.Request) {
 
 	err := database.DeleteVideo(params["id"], utils.ParseUintToString(claims.User_ID))
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
 	//Response
-	w.WriteHeader(http.StatusAccepted)
+	w.WriteHeader(http.StatusOK)
 }

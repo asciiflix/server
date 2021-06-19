@@ -2,15 +2,13 @@ package database
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/asciiflix/server/model"
-	"github.com/gofrs/uuid"
 )
 
 //Create video
 func CreateVideo(video model.Video) error {
-	video.UUID, _ = uuid.NewV4()
+
 	result := global_db.Create(&video)
 	if result.Error != nil {
 		return result.Error
@@ -21,12 +19,11 @@ func CreateVideo(video model.Video) error {
 //Get video by id
 func GetVideo(videoId string) (*model.Video, error) {
 	var video model.Video
-	result := global_db.Preload("Comments").Where("id = ?", videoId).First(&video)
+	result := global_db.Preload("Comments").Where("uuid = ?", videoId).First(&video)
 
 	if result.Error != nil {
 		return nil, result.Error
 	}
-	fmt.Println(video)
 	return &video, nil
 }
 
@@ -44,7 +41,7 @@ func GetVideos() (*[]model.Video, error) {
 func UpdateVideo(updateVideo model.Video) error {
 	//Check if Video exists by ID
 	var videoToUpdate model.Video
-	result := global_db.Where("id = ?", updateVideo.ID).First(&videoToUpdate)
+	result := global_db.Where("uuid = ?", updateVideo.UUID).First(&videoToUpdate)
 	if result.Error != nil {
 		return errors.New("video does not exist")
 	}
@@ -57,11 +54,24 @@ func UpdateVideo(updateVideo model.Video) error {
 	return nil
 }
 
-//Delete video by id
+//Delete video by uuid
 func DeleteVideo(videoId string, userId string) error {
-	result := global_db.Where("id = ?", videoId).Where("user_id = ?", userId).Delete(&model.Video{})
+	//Check if video exists and belongs to user
+	result := global_db.Where("uuid = ? AND user_id = ?", videoId, userId).First(&model.Video{})
 	if result.Error != nil {
 		return result.Error
+
 	}
+	global_db.Where("uuid = ? AND user_id = ?", videoId, userId).Delete(&model.Video{})
 	return nil
+}
+
+func GetContentID(videoUUID string) (string, error) {
+	var video model.Video
+	result := global_db.Where("uuid = ?", videoUUID).First(&video)
+
+	if result.Error != nil {
+		return "", result.Error
+	}
+	return video.VideoContentID, nil
 }

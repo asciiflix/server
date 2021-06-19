@@ -38,7 +38,7 @@ func initHandler(router *mux.Router) {
 	protected.Path("/user/updateUser").Queries("id", "{id}").HandlerFunc(updateUser).Methods(http.MethodPut)
 	protected.Path("/user/deleteUser").Queries("id", "{id}").HandlerFunc(deleteUser).Methods(http.MethodDelete)
 	//Video
-	protected.Path("/video/createVideo").Queries("id", "{id}").HandlerFunc(createVideo).Methods(http.MethodPost)
+	protected.Path("/video/createVideo").HandlerFunc(createVideo).Methods(http.MethodPost)
 	protected.Path("/video/deleteVideo").Queries("id", "{id}").HandlerFunc(deleteVideo).Methods(http.MethodDelete)
 	protected.Path("/video/updateVideo").Queries("id", "{id}").HandlerFunc(updateVideo).Methods(http.MethodPut)
 
