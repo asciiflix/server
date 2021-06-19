@@ -1,10 +1,11 @@
 package model
 
-import "gorm.io/gorm"
+import "time"
 
 type Comment struct {
-	gorm.Model
-	UserID  uint
-	VideoID uint
-	Content string
+	ID        uint
+	UserID    uint
+	VideoID   uint
+	CreatedAt time.Time
+	Content   string `gorm:"not null"`
 }

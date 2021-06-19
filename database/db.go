@@ -3,17 +3,18 @@ package database
 import (
 	"fmt"
 	"net/url"
+	"time"
 
 	"github.com/asciiflix/server/config"
 	"github.com/asciiflix/server/model"
+	"github.com/gofrs/uuid"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 var global_db *gorm.DB
 
-func StartDatabase() {
+func ConnectToDatabase() {
 
 	dsn := url.URL{
 		User:     url.UserPassword(config.Database.User, config.Database.Password),
@@ -25,7 +26,7 @@ func StartDatabase() {
 
 	db, err := gorm.Open(postgres.Open(dsn.String()), &gorm.Config{
 		//Disabling any log output from gorm
-		Logger: logger.Default.LogMode(logger.Silent),
+		//Logger: logger.Default.LogMode(logger.Silent),
 	})
 
 	if err != nil {
@@ -35,20 +36,27 @@ func StartDatabase() {
 	global_db = db
 
 	db.AutoMigrate(&model.User{}, &model.Video{}, &model.Comment{}, &model.Like{})
-	db.AutoMigrate(&model.VideoStats{})
+	uuid, _ := uuid.NewV4()
 	db.Create(&model.User{
-		Name:     "Bob",
-		Email:    "test@gmail.com",
-		Password: "afsdfsadf",
-		Videos: []model.Video{
-			{
-				Name:        "Video1",
-				Description: "Description",
-				Comments:    nil,
-				Likes:       nil,
-			},
-		},
-		Comments: nil,
-		Likes:    nil,
+		Model:  gorm.Model{ID: 1},
+		Name:   "Bob",
+		Videos: nil,
 	})
+	db.Create(&model.Video{
+		Model:          gorm.Model{ID: 1},
+		UUID:           uuid,
+		VideoContentID: "afds",
+		Title:          "Title",
+		Description:    "Desc",
+		UploadDate:     time.Now(),
+		Views:          10,
+		UserID:         1,
+		Comments: []model.Comment{{
+			UserID:  1,
+			VideoID: 1,
+			Content: "Hello",
+		}},
+		Likes: nil,
+	})
+
 }

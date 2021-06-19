@@ -13,12 +13,12 @@ type User struct {
 	Password    string
 	Picture_ID  string
 	Description string
-	Videos      []Video
-	Comments    []Comment
-	Likes       []Like
+	Videos      []Video   `gorm:"ForeignKey:UserID"`
+	Comments    []Comment `gorm:"ForeignKey:UserID"`
+	Likes       []Like    `gorm:"ForeignKey:UserID"`
 }
 
-//UserDetails fpr Private Endpoints (Settings etc.)
+//UserDetails for Private Endpoints (Settings etc.)
 type UserDetailsPrivate struct {
 	UserID      uint
 	Name        string

@@ -1,11 +1,16 @@
 package database
 
 import (
+	"errors"
+	"fmt"
+
 	"github.com/asciiflix/server/model"
+	"github.com/gofrs/uuid"
 )
 
 //Create video
 func CreateVideo(video model.Video) error {
+	video.UUID, _ = uuid.NewV4()
 	result := global_db.Create(&video)
 	if result.Error != nil {
 		return result.Error
@@ -16,10 +21,12 @@ func CreateVideo(video model.Video) error {
 //Get video by id
 func GetVideo(videoId string) (*model.Video, error) {
 	var video model.Video
-	result := global_db.Where("id = ?", videoId).First(&video)
+	result := global_db.Preload("Comments").Where("id = ?", videoId).First(&video)
+
 	if result.Error != nil {
 		return nil, result.Error
 	}
+	fmt.Println(video)
 	return &video, nil
 }
 
@@ -34,15 +41,16 @@ func GetVideos() (*[]model.Video, error) {
 }
 
 //Update video by id
-func UpdateVideo(videoId string, video model.Video) error {
-	//Get Video
+func UpdateVideo(updateVideo model.Video) error {
+	//Check if Video exists by ID
 	var videoToUpdate model.Video
-	result := global_db.Where("id = ?", videoId).First(&videoToUpdate)
+	result := global_db.Where("id = ?", updateVideo.ID).First(&videoToUpdate)
 	if result.Error != nil {
-		return result.Error
+		return errors.New("video does not exist")
 	}
-	//Replaces non-zero fields
-	result = global_db.Model(&videoToUpdate).Updates(video)
+
+	//Updates Values in Database
+	result = global_db.Model(&videoToUpdate).Updates(updateVideo)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -50,22 +58,10 @@ func UpdateVideo(videoId string, video model.Video) error {
 }
 
 //Delete video by id
-func DeleteVideo(videoId string) error {
-	result := global_db.Delete(&model.Video{}, videoId)
+func DeleteVideo(videoId string, userId string) error {
+	result := global_db.Where("id = ?", videoId).Where("user_id = ?", userId).Delete(&model.Video{})
 	if result.Error != nil {
 		return result.Error
 	}
 	return nil
 }
-
-//Testing for UUID-GEN
-/*func CreateVideo() {
-	var video model.VideoStats
-
-	video.ID, _ = uuid.NewV4()
-	video.Title = "Test Title"
-	video.Description = "Test Desc"
-
-	global_db.Create(&video)
-}
-*/

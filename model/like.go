@@ -1,9 +1,7 @@
 package model
 
-import "gorm.io/gorm"
-
 type Like struct {
-	gorm.Model
+	ID      uint
 	VideoID uint
 	UserID  uint
 }

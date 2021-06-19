@@ -6,6 +6,8 @@ import (
 
 	"github.com/asciiflix/server/database"
 	"github.com/asciiflix/server/model"
+	"github.com/asciiflix/server/utils"
+	"github.com/gofrs/uuid"
 	"github.com/gorilla/mux"
 )
 
@@ -32,16 +34,28 @@ func getVideos(w http.ResponseWriter, r *http.Request) {
 func createVideo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	video := model.Video{}
+
+	//Parse video from request body
 	err := json.NewDecoder(r.Body).Decode(&video)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	claims, _ := getJWTClaims(r)
+
+	//Check if user is authorized
+	if claims.User_ID != video.UserID {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	//Create Video
 	err = database.CreateVideo(video)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
+	//Response
 	w.WriteHeader(http.StatusCreated)
 
 }
@@ -54,11 +68,23 @@ func updateVideo(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	err = database.UpdateVideo(params["id"], video)
+	//Checking JWT
+	err = checkJWT(utils.ParseUintToString(video.UserID), r)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		basicVideoErrorHandler(err, w)
 		return
 	}
+	//Parsing data
+	video.UUID, _ = uuid.FromString(params["id"])
+
+	//Update User in DB
+	err = database.UpdateVideo(video)
+	if err != nil {
+		basicVideoErrorHandler(err, w)
+		return
+	}
+
+	//Response
 	w.WriteHeader(http.StatusAccepted)
 
 }
@@ -66,10 +92,14 @@ func updateVideo(w http.ResponseWriter, r *http.Request) {
 func deleteVideo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
-	err := database.DeleteVideo(params["id"])
+	claims, _ := getJWTClaims(r)
+
+	err := database.DeleteVideo(params["id"], utils.ParseUintToString(claims.User_ID))
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
+	//Response
 	w.WriteHeader(http.StatusAccepted)
 }

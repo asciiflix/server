@@ -1,6 +1,8 @@
 package model
 
 import (
+	"time"
+
 	"github.com/gofrs/uuid"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"gorm.io/gorm"
@@ -8,18 +10,15 @@ import (
 
 type Video struct {
 	gorm.Model
-	Name        string
-	Description string
-	UserID      uint
-	Comments    []Comment
-	Likes       []Like
-}
-
-type VideoStats struct {
-	ID          uuid.UUID `gorm:"primary_key; unique; type:uuid; column:id;"`
-	ObjectID    string
-	Title       string
-	Description string
+	UUID           uuid.UUID //`gorm:"primary_key; unique; type:uuid; column:id;"`
+	VideoContentID string
+	Title          string
+	Description    string
+	UploadDate     time.Time
+	Views          int
+	UserID         uint
+	Comments       []Comment `gorm:"ForeignKey:VideoID"`
+	Likes          []Like    `gorm:"ForeignKey:VideoID"`
 }
 
 type VideoContent struct {

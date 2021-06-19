@@ -10,3 +10,8 @@ func ParseStringToUint(toParse string) (uint, error) {
 	}
 	return uint(data), nil
 }
+
+func ParseUintToString(toParse uint) string {
+	data := strconv.FormatUint(uint64(toParse), 10)
+	return data
+}
