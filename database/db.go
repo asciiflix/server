@@ -13,7 +13,7 @@ import (
 
 var global_db *gorm.DB
 
-func StartDatabase() {
+func ConnectToDatabase() {
 
 	dsn := url.URL{
 		User:     url.UserPassword(config.Database.User, config.Database.Password),
@@ -31,8 +31,9 @@ func StartDatabase() {
 	if err != nil {
 		panic("Can't connect to database!")
 	}
-	config.Log.Info("DB Connected")
+	config.Log.Info("Connected to DB")
 	global_db = db
 
-	db.AutoMigrate(&model.User{})
+	db.AutoMigrate(&model.User{}, &model.Video{}, &model.Comment{}, &model.Like{})
+
 }

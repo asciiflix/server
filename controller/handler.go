@@ -1,15 +1,11 @@
 package controller
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 
 	"github.com/asciiflix/server/config"
-	"github.com/asciiflix/server/model"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
-	"github.com/sirupsen/logrus"
 )
 
 func initHandler(router *mux.Router) {
@@ -20,71 +16,41 @@ func initHandler(router *mux.Router) {
 	router.Path("/status").HandlerFunc(status).Methods(http.MethodGet)
 	router.Path("/register").HandlerFunc(register).Methods(http.MethodPost)
 	router.Path("/login").HandlerFunc(login).Methods(http.MethodPost)
+	//Video-Content
+	router.Path("/video/getContent").Queries("id", "{id}").HandlerFunc(getVideoContent).Methods(http.MethodGet)
+	//Video-MetaData
+	router.Path("/video/getVideo").Queries("id", "{id}").HandlerFunc(getVideo).Methods(http.MethodGet)
+	router.Path("/video/getVideos").HandlerFunc(getVideos).Methods(http.MethodGet)
+	router.Path("/user/getVideos").Queries("userID", "{userID}").HandlerFunc(getVideosFromUser).Methods(http.MethodGet)
+	//Video-Comments
+	router.Path("/video/getComments").Queries("id", "{id}").HandlerFunc(getComments).Methods(http.MethodGet)
+	//User-Information
+	router.Path("/user/getUser").Queries("id", "{id}").HandlerFunc(getUser).Methods(http.MethodGet)
+	router.Path("/user/getUsers").HandlerFunc(getAllUsers).Methods(http.MethodGet)
 
 	//Secure (JWT) Endpoints
 	protected := router.PathPrefix("/secure").Subrouter()
-	protected.Use(jwtCheck)
+	protected.Use(jwtPreHandler)
 	protected.Use(logRequests)
 	protected.Path("/my_status").HandlerFunc(status).Methods(http.MethodGet)
+	//Video-Content
+	protected.Path("/video/createContent").HandlerFunc(createVideoContent).Methods(http.MethodPost)
+	protected.Path("/video/deleteContent").Queries("id", "{id}").HandlerFunc(deleteVideoContent).Methods(http.MethodDelete)
+	//User-Information
+	protected.Path("/user/getUser").Queries("id", "{id}").HandlerFunc(getPrivateUser).Methods(http.MethodGet)
+	protected.Path("/user/updateUser").Queries("id", "{id}").HandlerFunc(updateUser).Methods(http.MethodPut)
+	protected.Path("/user/deleteUser").Queries("id", "{id}").HandlerFunc(deleteUser).Methods(http.MethodDelete)
+	//Video
+	protected.Path("/video/createVideo").HandlerFunc(createVideo).Methods(http.MethodPost)
+	protected.Path("/video/deleteVideo").Queries("id", "{id}").HandlerFunc(deleteVideo).Methods(http.MethodDelete)
+	protected.Path("/video/updateVideo").Queries("id", "{id}").HandlerFunc(updateVideo).Methods(http.MethodPut)
+	//Like
+	protected.Path("/video/getLike").Queries("id", "{id}").HandlerFunc(getLiked).Methods(http.MethodDelete)
+	protected.Path("/video/createLike").Queries("id", "{id}").HandlerFunc(createLike).Methods(http.MethodPost)
+	protected.Path("/video/deleteLike").Queries("id", "{id}").HandlerFunc(deleteLike).Methods(http.MethodDelete)
+	//Comments
+	protected.Path("/video/createComment").Queries("id", "{id}").HandlerFunc(createComment).Methods(http.MethodPost)
 
-}
-
-func logRequests(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		//Log Incoming Requests to Logger
-		config.Log.WithFields(logrus.Fields{
-			"endpoint": r.URL.Path,
-			"ip":       r.RemoteAddr,
-		}).Trace("New Request")
-
-		next.ServeHTTP(w, r)
-	})
-}
-
-//Check JWT Token for User Authentication
-func jwtCheck(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		//Checking if there is an existent Header Key "Token"
-		if r.Header["Token"] == nil {
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusUnauthorized)
-			json.NewEncoder(w).Encode(map[string]interface{}{"message": "No JWT Token"})
-			return
-		}
-
-		//Get JWT-Private-Key
-		mySigningKey := config.ApiConfig.JWTKey
-
-		//Parse Incoming JWT Token. Token must be in the Header with the Key "Token"
-		token, err := jwt.ParseWithClaims(
-			r.Header["Token"][0],
-			&model.UserClaim{},
-			func(token *jwt.Token) (interface{}, error) {
-				return []byte(mySigningKey), nil
-			},
-		)
-
-		//Checking for JWT Parsing Errors like (Invalid JWT Token or if the Token is expired)
-		if err != nil {
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusUnauthorized)
-			json.NewEncoder(w).Encode(map[string]interface{}{"message": "JWT Token Expired"})
-			return
-		}
-
-		//Not Checking for errors in claims
-		if claims, _ := token.Claims.(*model.UserClaim); token.Valid {
-
-			//Log JWT-Sample-Payload for testing
-			config.Log.WithFields(logrus.Fields{
-				"user_email": claims.User_email,
-				"user_id":    claims.User_ID,
-			}).Trace("JWT-Payload")
-
-			next.ServeHTTP(w, r)
-			return
-		}
-	})
 }
 
 func status(w http.ResponseWriter, r *http.Request) {

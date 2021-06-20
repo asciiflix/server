@@ -14,6 +14,13 @@ type DBConfig struct {
 	Port     string `mapstructure:"POSTGRES_PORT"`
 }
 
+type MongoDBConfig struct {
+	Host     string `mapstructure:"MONGO_HOST"`
+	Port     string `mapstructure:"MONGO_PORT"`
+	User     string `mapstructure:"MONGO_USERNAME"`
+	Password string `mapstructure:"MONGO_PASSWORD"`
+}
+
 type APIConfig struct {
 	Port     int    `mapstructure:"API_PORT"`
 	JWTKey   string `mapstructure:"JWT_PRIVATE_KEY"`
@@ -23,6 +30,7 @@ type APIConfig struct {
 var Version = "development"
 var Database DBConfig
 var ApiConfig APIConfig
+var MongoDB MongoDBConfig
 
 func GetConfig() {
 	viper.SetConfigName("config")
@@ -38,9 +46,10 @@ func GetConfig() {
 	}
 
 	err_db := viper.Unmarshal(&Database)
+	err_mongoDB := viper.Unmarshal(&MongoDB)
 	err_api := viper.Unmarshal(&ApiConfig)
 
-	if err_db != nil || err_api != nil {
+	if err_db != nil || err_api != nil || err_mongoDB != nil {
 		fmt.Printf("Unable to decode into struct, %v", err)
 	}
 

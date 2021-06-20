@@ -8,7 +8,18 @@ import (
 )
 
 func TestGenerateBCryptFromPassword(t *testing.T) {
-	testUser := model.User{gorm.Model{}, "TestUser", "test@user.com", "spoujf98sazg879"}
+	testUser := model.User{
+		Model:       gorm.Model{},
+		Name:        "TestUser",
+		Email:       "test@user.com",
+		Password:    "fdsajieuovbouae",
+		Picture_ID:  "no",
+		Description: "Best tester",
+		Videos:      nil,
+		Comments:    nil,
+		Likes:       nil,
+	}
+
 	origUser := testUser
 
 	err := GenerateBCryptFromPassword(&testUser)
@@ -23,7 +34,17 @@ func TestGenerateBCryptFromPassword(t *testing.T) {
 }
 
 func TestCompPasswordAndHash(t *testing.T) {
-	testUser := model.User{gorm.Model{}, "TestUser", "test@user.com", "spoujf98sazg879"}
+	testUser := model.User{
+		Model:       gorm.Model{},
+		Name:        "TestUser",
+		Email:       "test@user.com",
+		Password:    "fdsajieuovbouae",
+		Picture_ID:  "no",
+		Description: "Best tester",
+		Videos:      nil,
+		Comments:    nil,
+		Likes:       nil,
+	}
 	origUser := testUser
 
 	//BCrypt PW of testUser
