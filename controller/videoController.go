@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/asciiflix/server/config"
 	"github.com/asciiflix/server/database"
 	"github.com/asciiflix/server/model"
 	"github.com/gofrs/uuid"
@@ -103,8 +104,31 @@ func deleteVideo(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	claims, _ := getJWTClaims(r)
 
-	err := database.DeleteVideo(params["id"], claims.User_ID)
+	//Getting ContentID from UUID
+	param_id, err := database.GetContentID(mux.Vars(r)["id"])
 	if err != nil {
+		config.Log.Error(err)
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	contentID, err := primitive.ObjectIDFromHex(param_id)
+
+	if err != nil {
+		config.Log.Error(err)
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	//Try to delete video stats
+	err = database.DeleteVideo(params["id"], claims.User_ID)
+	if err != nil {
+		config.Log.Error(err)
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	result := database.DeleteVideoContent(contentID)
+	if result["message"] != "Successfully deleted VideoContent by ID" {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
