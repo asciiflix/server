@@ -1,78 +1,92 @@
 package database
 
 import (
-	"github.com/asciiflix/server/config"
+	"errors"
+	"fmt"
+
 	"github.com/asciiflix/server/model"
-	"github.com/gofrs/uuid"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func getVideoCollection() *mongo.Collection {
-	return global_mongo_client.Database("asciiflix").Collection("videos")
+//Create video
+func CreateVideo(video model.Video) error {
+
+	result := global_db.Create(&video)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
 }
 
-func CreateVideoContent(video *model.VideoContent) map[string]interface{} {
-	//MongoDB Insert
-	result, err := getVideoCollection().InsertOne(global_mongo_context, video)
+//Get video by id
+func GetVideo(videoId string) (*model.Video, error) {
+	var video model.Video
+	result := global_db.Preload("Comments").Preload("Likes").Where("uuid = ?", videoId).First(&video)
 
-	//Error Handling
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &video, nil
+}
+
+//Get all Videos
+func GetVideos() (*[]model.Video, error) {
+	var videos []model.Video
+	result := global_db.Find(&videos)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &videos, nil
+}
+
+//Get all Videos from one user
+func GetVideosFromUser(userID string) (*[]model.Video, error) {
+	var videos []model.Video
+	result := global_db.Where("user_id = ?", userID).Find(&videos)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &videos, nil
+}
+
+//Update video by id
+func UpdateVideo(updateVideo model.Video) error {
+	//Check if Video exists by ID
+	var videoToUpdate model.Video
+	result := global_db.Where("uuid = ?", updateVideo.UUID).First(&videoToUpdate)
+	if result.Error != nil {
+		return errors.New("video does not exist")
+	}
+
+	//Updates Values in Database
+	result = global_db.Model(&videoToUpdate).Updates(updateVideo)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+//Delete video by uuid
+func DeleteVideo(videoId string, userId uint) error {
+	//Check if video exists and belongs to user
+	video, err := GetVideo(videoId)
 	if err != nil {
-		config.Log.Error(err)
-		return map[string]interface{}{"message": "Error in MongoDB"}
+		fmt.Println(videoId)
+		return err
 	}
-
-	//Response
-	var response = map[string]interface{}{"message": "Successfully created VideoContent"}
-	response["_id"] = result.InsertedID
-	return response
+	if userId != video.UserID {
+		fmt.Println(videoId)
+		return errors.New("user does not match")
+	}
+	global_db.Where("uuid = ? AND user_id = ?", videoId, userId).Delete(&model.Video{})
+	return nil
 }
 
-func DeleteVideoContent(contentID primitive.ObjectID) map[string]interface{} {
-	//Try to Delete VideoContent by ID
-	result, err := getVideoCollection().DeleteOne(global_mongo_context, bson.M{"_id": contentID})
+func GetContentID(videoUUID string) (string, error) {
+	var video model.Video
+	result := global_db.Where("uuid = ?", videoUUID).First(&video)
 
-	//Error Handling
-	if err != nil {
-		config.Log.Error(err)
-		return map[string]interface{}{"message": "Error in MongoDB"}
+	if result.Error != nil {
+		return "", result.Error
 	}
-	if result.DeletedCount == 0 {
-		return map[string]interface{}{"message": "ID does not exist."}
-	}
-
-	//Response
-	var response = map[string]interface{}{"message": "Successfully deleted VideoContent by ID"}
-	response["result"] = result
-	return response
-}
-
-func GetVideoContent(contentID primitive.ObjectID) map[string]interface{} {
-	var videoContent model.VideoContent
-
-	//Search by ContentID for VideoContent Entry
-	err := getVideoCollection().FindOne(global_mongo_context, bson.M{"_id": contentID}).Decode(&videoContent)
-
-	//Error Handlong
-	if err != nil {
-		config.Log.Error(err)
-		return map[string]interface{}{"message": "ID does not exist."}
-	}
-
-	//Response
-	var response = map[string]interface{}{"message": "Successfully found VideoContent by ID"}
-	response["content"] = videoContent
-	return response
-}
-
-//Testing for UUID-GEN
-func CreateVideo() {
-	var video model.VideoStats
-
-	video.ID, _ = uuid.NewV4()
-	video.Title = "Test Title"
-	video.Description = "Test Desc"
-
-	global_db.Create(&video)
+	return video.VideoContentID, nil
 }
