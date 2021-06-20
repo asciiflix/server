@@ -18,3 +18,8 @@ Every Endpoint is well documented in this Documentation :)
 | `/secure/video/createVideo`   | POST    | [video](./video.md)                   | Create video by UUID                                   |
 | `/secure/video/deleteVideo`   | DELETE  | [video](./video.md)                   | Delete video by UUID                                   |
 | `/secure/video/updateVideo`   | PUT     | [video](./video.md)                   | Edit video data by UUID                                |
+| `/user/getUser`               | GET     | [user](./user.md)                     | Get User by UserID                                     |
+| `/user/getUsers`              | GET     | [user](./user.md)                     | Get all Users                                          |
+| `/secure/user/getUser`        | GET     | [user](./user.md)                     | Get Private-User Information by UserID                 |
+| `/secure/user/editUser`       | PUT     | [user](./user.md)                     | Edit User by UserID                                    |
+| `/secure/user/deleteUser`     | DELETE  | [user](./user.md)                     | Delete User by UserID                                  |

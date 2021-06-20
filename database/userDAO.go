@@ -174,6 +174,7 @@ func GetAllUsers() ([]model.UserDetailsPublic, error) {
 
 	for _, user := range users {
 		var tempUser model.UserDetailsPublic
+		tempUser.UserID = user.ID
 		tempUser.Name = user.Name
 		tempUser.Description = user.Description
 		tempUser.Picture_ID = user.Picture_ID

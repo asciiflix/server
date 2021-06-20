@@ -26,7 +26,7 @@ func initHandler(router *mux.Router) {
 	router.Path("/video/getComments").Queries("id", "{id}").HandlerFunc(getComments).Methods(http.MethodGet)
 	//User-Information
 	router.Path("/user/getUser").Queries("id", "{id}").HandlerFunc(getUser).Methods(http.MethodGet)
-	router.Path("/user/getAllUsers").HandlerFunc(getAllUsers).Methods(http.MethodGet)
+	router.Path("/user/getUsers").HandlerFunc(getAllUsers).Methods(http.MethodGet)
 
 	//Secure (JWT) Endpoints
 	protected := router.PathPrefix("/secure").Subrouter()
