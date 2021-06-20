@@ -21,6 +21,7 @@ func initHandler(router *mux.Router) {
 	//Video-MetaData
 	router.Path("/video/getVideo").Queries("id", "{id}").HandlerFunc(getVideo).Methods(http.MethodGet)
 	router.Path("/video/getVideos").HandlerFunc(getVideos).Methods(http.MethodGet)
+	router.Path("/user/getVideos").Queries("userID", "{userID}").HandlerFunc(getVideosFromUser).Methods(http.MethodGet)
 	//User-Information
 	router.Path("/user/getUser").Queries("id", "{id}").HandlerFunc(getUser).Methods(http.MethodGet)
 	router.Path("/user/getAllUsers").HandlerFunc(getAllUsers).Methods(http.MethodGet)

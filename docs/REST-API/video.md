@@ -4,15 +4,13 @@ Keep in mind the create/update/delete video Endpoints are behind `/secure`, so y
 
 # Overview
 
-## List of Endpoints
-
-| API-Endpoint                | Methods | Doc                       | Description             |
-| --------------------------- | ------- | ------------------------- | ----------------------- |
-| `/video/getVideo`           | GET     | [getVideo](./video.md)    | Get video by UUID       |
-| `/video/getVideos`          | GET     | [getVideos](./video.md)   | Get all videos          |
-| `/secure/video/createVideo` | POST    | [createVideo](./video.md) | Create video by UUID    |
-| `/secure/video/deleteVideo` | DELETE  | [deleteVideo](./video.md) | Delete video by UUID    |
-| `/secure/video/updateVideo` | PUT     | [updateVideo](./video.md) | Edit video data by UUID |
+| API-Endpoint                | Methods | Doc                          | Description             |
+| --------------------------- | ------- | ---------------------------- | ----------------------- |
+| `/video/getVideo`           | GET     | [getVideo](#get-video)       | Get video by UUID       |
+| `/video/getVideos`          | GET     | [getVideos](#get-videos)     | Get all videos          |
+| `/secure/video/createVideo` | POST    | [createVideo](#create-video) | Create video by UUID    |
+| `/secure/video/deleteVideo` | DELETE  | [deleteVideo](#update-video) | Delete video by UUID    |
+| `/secure/video/updateVideo` | PUT     | [updateVideo](#delete-video) | Edit video data by UUID |
 
 # Get video
 

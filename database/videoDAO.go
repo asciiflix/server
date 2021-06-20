@@ -38,6 +38,16 @@ func GetVideos() (*[]model.Video, error) {
 	return &videos, nil
 }
 
+//Get all Videos from one user
+func GetVideosFromUser(userID string) (*[]model.Video, error) {
+	var videos []model.Video
+	result := global_db.Where("user_id = ?", userID).Find(&videos)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &videos, nil
+}
+
 //Update video by id
 func UpdateVideo(updateVideo model.Video) error {
 	//Check if Video exists by ID

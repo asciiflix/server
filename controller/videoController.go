@@ -35,6 +35,17 @@ func getVideos(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(videos)
 }
 
+func getVideosFromUser(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(r)
+	videos, err := database.GetVideosFromUser(params["userID"])
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err)
+		config.Log.Error(err)
+	}
+	json.NewEncoder(w).Encode(videos)
+}
 func createVideo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	video := model.VideoFull{}
