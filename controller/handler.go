@@ -16,11 +16,11 @@ func initHandler(router *mux.Router) {
 	router.Path("/status").HandlerFunc(status).Methods(http.MethodGet)
 	router.Path("/register").HandlerFunc(register).Methods(http.MethodPost)
 	router.Path("/login").HandlerFunc(login).Methods(http.MethodPost)
-	router.Path("/videos").HandlerFunc(getVideos).Methods(http.MethodGet)
 	//Video-Content
 	router.Path("/video/getContent").Queries("id", "{id}").HandlerFunc(getVideoContent).Methods(http.MethodGet)
 	//Video-MetaData
 	router.Path("/video/getVideo").Queries("id", "{id}").HandlerFunc(getVideo).Methods(http.MethodGet)
+	router.Path("/video/getVideos").HandlerFunc(getVideos).Methods(http.MethodGet)
 	//User-Information
 	router.Path("/user/getUser").Queries("id", "{id}").HandlerFunc(getUser).Methods(http.MethodGet)
 	router.Path("/user/getAllUsers").HandlerFunc(getAllUsers).Methods(http.MethodGet)
