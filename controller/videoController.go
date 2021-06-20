@@ -2,106 +2,165 @@ package controller
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
+	"time"
 
 	"github.com/asciiflix/server/config"
 	"github.com/asciiflix/server/database"
 	"github.com/asciiflix/server/model"
+	"github.com/gofrs/uuid"
+	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func createVideoContent(w http.ResponseWriter, r *http.Request) {
+func getVideo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-
-	var videoContent model.VideoContent
-
-	err := json.NewDecoder(r.Body).Decode(&videoContent)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-	} else {
-		//DAO Error Handling
-		result := database.CreateVideoContent(&videoContent)
-		if result["message"] != "Successfully created VideoContent" {
-			w.WriteHeader(http.StatusBadRequest)
-		} else {
-			w.WriteHeader(http.StatusCreated)
-		}
-
-		//Response
-		json.NewEncoder(w).Encode(result)
-	}
-
-}
-
-func getVideoContent(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	//Getting ID from HTTP Parameters
-	var param_id string
-	param_id, err := getIDFromParameters(w, r)
-
-	if err != nil {
-		return
-	}
-
-	contentID, err := primitive.ObjectIDFromHex(param_id)
+	params := mux.Vars(r)
+	video, err := database.GetVideo(params["id"])
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode(map[string]interface{}{"message": "ID does not exist."})
 		config.Log.Error(err)
-	} else {
-		//DAO Error Handling
-		result := database.GetVideoContent(contentID)
-		if result["message"] != "Successfully found VideoContent by ID" {
-			w.WriteHeader(http.StatusNotFound)
-		} else {
-			w.WriteHeader(http.StatusOK)
-		}
-
-		//Response
-		json.NewEncoder(w).Encode(result)
+		return
 	}
+	json.NewEncoder(w).Encode(model.GetPublicVideo(*video))
+}
+
+func getVideos(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	videos, err := database.GetVideos()
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err)
+		config.Log.Error(err)
+	}
+	var videosPublic []model.VideoPublic
+	for _, vid := range *videos {
+		videosPublic = append(videosPublic, model.GetPublicVideo(vid))
+	}
+	json.NewEncoder(w).Encode(videosPublic)
+}
+
+func getVideosFromUser(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(r)
+	videos, err := database.GetVideosFromUser(params["userID"])
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err)
+		config.Log.Error(err)
+	}
+	var videosPublic []model.VideoPublic
+	for _, vid := range *videos {
+		videosPublic = append(videosPublic, model.GetPublicVideo(vid))
+	}
+	json.NewEncoder(w).Encode(videosPublic)
+}
+func createVideo(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	video := model.VideoFull{}
+
+	//Parse video from request body
+	err := json.NewDecoder(r.Body).Decode(&video)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		config.Log.Error(err)
+		return
+	}
+	claims, _ := getJWTClaims(r)
+
+	//Set User
+	video.VideoStats.UserID = claims.User_ID
+
+	//Set defaults
+	video.VideoStats.UploadDate = time.Now()
+	video.VideoStats.Views = 0
+
+	//Create Video content
+	result := database.CreateVideoContent(&video.VideoContent)
+	if result["message"] != "Successfully created VideoContent" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	video.VideoStats.VideoContentID = result["_id"].(primitive.ObjectID).Hex()
+
+	video.VideoStats.UUID, _ = uuid.NewV4()
+	//Create Video
+	err = database.CreateVideo(video.VideoStats)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
+		config.Log.Error(err)
+		return
+	}
+
+	//Response
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(map[string]interface{}{"videoID": video.VideoStats.UUID})
 
 }
 
-func deleteVideoContent(w http.ResponseWriter, r *http.Request) {
+func updateVideo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-
-	//Getting ID from HTTP Parameters
-	var param_id string
-	param_id, err := getIDFromParameters(w, r)
-
+	params := mux.Vars(r)
+	video := model.Video{}
+	err := json.NewDecoder(r.Body).Decode(&video)
 	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	//Checking JWT
+	claims, _ := getJWTClaims(r)
+	video.UserID = claims.User_ID
+	//Parsing data
+	video.UUID, _ = uuid.FromString(params["id"])
+
+	//Update User in DB
+	err = database.UpdateVideo(video)
+	if err != nil {
+		basicVideoErrorHandler(err, w)
+		return
+	}
+
+	//Response
+	w.WriteHeader(http.StatusAccepted)
+
+}
+
+func deleteVideo(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(r)
+	claims, _ := getJWTClaims(r)
+
+	//Getting ContentID from UUID
+	param_id, err := database.GetContentID(mux.Vars(r)["id"])
+	if err != nil {
+		config.Log.Error(err)
+		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
 	contentID, err := primitive.ObjectIDFromHex(param_id)
+
 	if err != nil {
 		config.Log.Error(err)
-	} else {
-		//DAO Error Handling
-		result := database.DeleteVideoContent(contentID)
-		if result["message"] != "Successfully deleted VideoContent by ID" {
-			w.WriteHeader(http.StatusNotFound)
-		} else {
-			w.WriteHeader(http.StatusOK)
-		}
-
-		//Response
-		json.NewEncoder(w).Encode(result)
+		w.WriteHeader(http.StatusNotFound)
+		return
 	}
 
-}
-
-func getIDFromParameters(w http.ResponseWriter, r *http.Request) (id string, err error) {
-	param_id := r.URL.Query()["id"]
-
-	if len(param_id) < 1 {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]interface{}{"message": "No ID in parameters"})
-		return "", errors.New("no id in param")
+	//Try to delete video stats
+	err = database.DeleteVideo(params["id"], claims.User_ID)
+	if err != nil {
+		config.Log.Error(err)
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	result := database.DeleteVideoContent(contentID)
+	if result["message"] != "Successfully deleted VideoContent by ID" {
+		w.WriteHeader(http.StatusNotFound)
+		return
 	}
 
-	return param_id[0], nil
+	//Response
+	w.WriteHeader(http.StatusOK)
 }
