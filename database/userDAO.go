@@ -53,7 +53,7 @@ func LoginUser(login_data model.UserLogin) map[string]interface{} {
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour ^ 24).Unix(),
 			IssuedAt:  time.Now().Unix(),
-			Issuer:    "apt.asciiflix.tech",
+			Issuer:    "api.asciiflix.tech",
 		},
 	}
 
@@ -78,7 +78,6 @@ func LoginUser(login_data model.UserLogin) map[string]interface{} {
 //Get User Information by ID
 func GetUser(userID string) (*model.UserDetailsPublic, error) {
 	var user model.User
-	var publicUser model.UserDetailsPublic
 
 	//Try Getting User Information from DB
 	result := global_db.Where("id = ?", userID).First(&user)
@@ -88,11 +87,7 @@ func GetUser(userID string) (*model.UserDetailsPublic, error) {
 	}
 
 	//Parsing Object
-	publicUser.Name = user.Name
-	publicUser.UserID = user.ID
-	publicUser.Description = user.Description
-	publicUser.Picture_ID = user.Picture_ID
-	publicUser.Videos = user.Videos
+	publicUser := user.GetPublicUser()
 
 	return &publicUser, nil
 }
@@ -100,7 +95,6 @@ func GetUser(userID string) (*model.UserDetailsPublic, error) {
 //Get PrivateInformation for User for Settings etc.
 func GetPrivateUser(userID string) (*model.UserDetailsPrivate, error) {
 	var user model.User
-	var privateUser model.UserDetailsPrivate
 
 	//Try Getting User Information from DB
 	result := global_db.Where("id = ?", userID).First(&user)
@@ -110,14 +104,7 @@ func GetPrivateUser(userID string) (*model.UserDetailsPrivate, error) {
 	}
 
 	//Parsing Object
-	privateUser.Name = user.Name
-	privateUser.UserID = user.ID
-	privateUser.Email = user.Email
-	privateUser.Description = user.Description
-	privateUser.Picture_ID = user.Picture_ID
-	privateUser.Videos = user.Videos
-	privateUser.Comments = user.Comments
-	privateUser.Likes = user.Likes
+	privateUser := user.GetPrivateUser()
 
 	return &privateUser, nil
 }
@@ -173,13 +160,8 @@ func GetAllUsers() ([]model.UserDetailsPublic, error) {
 	}
 
 	for _, user := range users {
-		var tempUser model.UserDetailsPublic
-		tempUser.UserID = user.ID
-		tempUser.Name = user.Name
-		tempUser.Description = user.Description
-		tempUser.Picture_ID = user.Picture_ID
-		tempUser.Videos = user.Videos
-		publicInformation = append(publicInformation, tempUser)
+		publicUser := user.GetPublicUser()
+		publicInformation = append(publicInformation, publicUser)
 	}
 
 	return publicInformation, nil

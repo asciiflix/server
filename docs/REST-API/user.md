@@ -1,6 +1,13 @@
 # User
 Keep in mind the getPrivate/update/delete user Endpoints are behind `/secure`, so you will need a valid JWT-Token.
 
+# Overview
+- [Get User](#get-user)
+- [Get PrivateUser Information](#get-private-user)
+- [Get All Users](#get-all-users)
+- [Update User](#update-user)
+- [Delete User](#delete-user)
+
 # Get User
 To get Public Information about an user, you will just need the UserID. Call the Endpoint ``/user/getUser`` with a GET request, and the UserID as an parameter.
 ## Usage
@@ -17,7 +24,7 @@ Just call ``/user/getUser?id={{userID}}`` with a GET Request.
 ````
 
 # Get Private User
-To get more Information about an user, you can use the Endpont ``/secure/user/getUser`` with a GET request and Informations like email etc. Only the user itself can access his private Information. The JWT Token has to be linked to the requested user.
+To get more Information about an user, you can use the Endpont ``/secure/user/getUser`` with a GET request and Information like email etc. Only the user itself can access his private Information. The JWT Token has to be linked to the requested user.
 ## Usage
 Just call ``/secure/user/getUser?id={{userID}}`` with a GET Request and the JWT-Token in the Header ``Token``.
 ## Response
@@ -122,11 +129,11 @@ The Body can have almost every option to update:
 }
 ````
 ## Response
-The Reponse Body is empty, you will get a ``202`` Code
+The Response Body is empty, you will get a ``202`` Code
 
 # Delete User
 To delete a user, call the endpoint ``/secure/user/deleteUser`` with a DELETE request.
 ## Usage
 Call ``/secure/user/deleteUser?id={{userID}}`` with the users linked JWT-Token and the correct UserID, to delete the user.
 ## Response
-The Reponse Body is empty, you will get a ``204`` Code
+The Response Body is empty, you will get a ``204`` Code

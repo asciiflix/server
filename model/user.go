@@ -52,5 +52,27 @@ type UserClaim struct {
 	User_email string
 }
 
-//Todo Parse function public
-//Todo parse function private
+func (user User) GetPublicUser() UserDetailsPublic {
+	var publicUser UserDetailsPublic
+	publicUser.Name = user.Name
+	publicUser.UserID = user.ID
+	publicUser.Description = user.Description
+	publicUser.Picture_ID = user.Picture_ID
+	publicUser.Videos = user.Videos
+
+	return publicUser
+}
+
+func (user User) GetPrivateUser() UserDetailsPrivate {
+	var privateUser UserDetailsPrivate
+	privateUser.Name = user.Name
+	privateUser.UserID = user.ID
+	privateUser.Email = user.Email
+	privateUser.Description = user.Description
+	privateUser.Picture_ID = user.Picture_ID
+	privateUser.Videos = user.Videos
+	privateUser.Comments = user.Comments
+	privateUser.Likes = user.Likes
+
+	return privateUser
+}
