@@ -1051,61 +1051,6 @@
 			"name": "Video - Content",
 			"item": [
 				{
-					"name": "Video Content - Delete",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status Code is 200\", function() {\r",
-									"    pm.response.to.have.status(200);\r",
-									"});\r",
-									"\r",
-									"var jsonData = JSON.parse(responseBody);\r",
-									"\r",
-									"pm.test(\"Correct Message\", function () {\r",
-									"    pm.expect(jsonData.message).to.equal(\"Successfully deleted VideoContent by ID\")\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Correct Result\", function () {\r",
-									"    pm.expect(jsonData.result.DeletedCount).to.equal(1)\r",
-									"});\r",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Token",
-								"value": "{{jwtToken}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{api_url}}/secure/video/deleteContent?id={{videoContentID}}",
-							"host": [
-								"{{api_url}}"
-							],
-							"path": [
-								"secure",
-								"video",
-								"deleteContent"
-							],
-							"query": [
-								{
-									"key": "id",
-									"value": "{{videoContentID}}"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Video Content - Delete Non Existing",
 					"event": [
 						{
@@ -1131,7 +1076,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{api_url}}/secure/video/deleteContent?id={{videoContentID}}",
+							"raw": "{{api_url}}/secure/video/deleteContent?id={{videoID}}",
 							"host": [
 								"{{api_url}}"
 							],
@@ -1143,7 +1088,7 @@
 							"query": [
 								{
 									"key": "id",
-									"value": "{{videoContentID}}"
+									"value": "{{videoID}}"
 								}
 							]
 						}
@@ -1818,13 +1763,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{api_url}}/user/getAllUsers",
+							"raw": "{{api_url}}/user/getUsers",
 							"host": [
 								"{{api_url}}"
 							],
 							"path": [
 								"user",
-								"getAllUsers"
+								"getUsers"
 							]
 						}
 					},
