@@ -3,6 +3,7 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/asciiflix/server/config"
 	"github.com/asciiflix/server/database"
@@ -62,6 +63,10 @@ func createVideo(w http.ResponseWriter, r *http.Request) {
 
 	//Set User
 	video.VideoStats.UserID = claims.User_ID
+
+	//Set defaults
+	video.VideoStats.UploadDate = time.Now()
+	video.VideoStats.Views = 0
 
 	//Create Video content
 	result := database.CreateVideoContent(&video.VideoContent)

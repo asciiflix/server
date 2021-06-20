@@ -20,7 +20,7 @@ func CreateVideo(video model.Video) error {
 //Get video by id
 func GetVideo(videoId string) (*model.Video, error) {
 	var video model.Video
-	result := global_db.Preload("Comments").Where("uuid = ?", videoId).First(&video)
+	result := global_db.Preload("Comments").Preload("Likes").Where("uuid = ?", videoId).First(&video)
 
 	if result.Error != nil {
 		return nil, result.Error
