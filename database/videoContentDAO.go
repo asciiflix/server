@@ -6,6 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"gorm.io/gorm"
 )
 
 func getVideoCollection() *mongo.Collection {
@@ -59,6 +60,11 @@ func GetVideoContent(contentID primitive.ObjectID) map[string]interface{} {
 		return map[string]interface{}{"message": "ID does not exist."}
 	}
 
+	//Increment views
+	result := global_db.Table("videos").Where("video_content_id = ?", contentID.Hex()).UpdateColumn("views", gorm.Expr("views + ?", 1))
+	if result.Error != nil {
+		config.Log.Error(result.Error)
+	}
 	//Response
 	var response = map[string]interface{}{"message": "Successfully found VideoContent by ID"}
 	response["content"] = videoContent
