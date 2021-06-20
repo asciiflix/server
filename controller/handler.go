@@ -22,6 +22,8 @@ func initHandler(router *mux.Router) {
 	router.Path("/video/getVideo").Queries("id", "{id}").HandlerFunc(getVideo).Methods(http.MethodGet)
 	router.Path("/video/getVideos").HandlerFunc(getVideos).Methods(http.MethodGet)
 	router.Path("/user/getVideos").Queries("userID", "{userID}").HandlerFunc(getVideosFromUser).Methods(http.MethodGet)
+	//Video-Comments
+	router.Path("/video/getComments").Queries("id", "{id}").HandlerFunc(getComments).Methods(http.MethodGet)
 	//User-Information
 	router.Path("/user/getUser").Queries("id", "{id}").HandlerFunc(getUser).Methods(http.MethodGet)
 	router.Path("/user/getAllUsers").HandlerFunc(getAllUsers).Methods(http.MethodGet)
@@ -42,6 +44,12 @@ func initHandler(router *mux.Router) {
 	protected.Path("/video/createVideo").HandlerFunc(createVideo).Methods(http.MethodPost)
 	protected.Path("/video/deleteVideo").Queries("id", "{id}").HandlerFunc(deleteVideo).Methods(http.MethodDelete)
 	protected.Path("/video/updateVideo").Queries("id", "{id}").HandlerFunc(updateVideo).Methods(http.MethodPut)
+	//Like
+	protected.Path("/video/getLike").Queries("id", "{id}").HandlerFunc(getLiked).Methods(http.MethodDelete)
+	protected.Path("/video/createLike").Queries("id", "{id}").HandlerFunc(createLike).Methods(http.MethodPost)
+	protected.Path("/video/deleteLike").Queries("id", "{id}").HandlerFunc(deleteLike).Methods(http.MethodDelete)
+	//Comments
+	protected.Path("/video/createComment").Queries("id", "{id}").HandlerFunc(createComment).Methods(http.MethodPost)
 
 }
 

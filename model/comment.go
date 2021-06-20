@@ -3,7 +3,7 @@ package model
 import "time"
 
 type Comment struct {
-	ID        uint
+	ID        uint `gorm:"primaryKey"`
 	UserID    uint
 	VideoID   uint
 	CreatedAt time.Time
