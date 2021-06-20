@@ -18,6 +18,7 @@ func getVideo(w http.ResponseWriter, r *http.Request) {
 	video, err := database.GetVideo(params["id"])
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
+		config.Log.Error(err)
 		return
 	}
 	json.NewEncoder(w).Encode(video)
@@ -29,6 +30,7 @@ func getVideos(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(err)
+		config.Log.Error(err)
 	}
 	json.NewEncoder(w).Encode(videos)
 }
@@ -42,6 +44,7 @@ func createVideo(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(err.Error())
+		config.Log.Error(err)
 		return
 	}
 	claims, _ := getJWTClaims(r)
@@ -63,6 +66,7 @@ func createVideo(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(err.Error())
+		config.Log.Error(err)
 		return
 	}
 

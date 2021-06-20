@@ -41,6 +41,7 @@ func getVideoContent(w http.ResponseWriter, r *http.Request) {
 	param_id, err := database.GetContentID(mux.Vars(r)["id"])
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
+		config.Log.Error(err)
 		return
 	}
 
@@ -70,6 +71,7 @@ func deleteVideoContent(w http.ResponseWriter, r *http.Request) {
 	param_id, err := database.GetContentID(mux.Vars(r)["id"])
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
+		config.Log.Error(err)
 		return
 	}
 
