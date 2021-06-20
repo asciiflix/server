@@ -22,7 +22,7 @@ func getVideo(w http.ResponseWriter, r *http.Request) {
 		config.Log.Error(err)
 		return
 	}
-	json.NewEncoder(w).Encode(video)
+	json.NewEncoder(w).Encode(model.GetPublicVideo(*video))
 }
 
 func getVideos(w http.ResponseWriter, r *http.Request) {
@@ -33,7 +33,11 @@ func getVideos(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(err)
 		config.Log.Error(err)
 	}
-	json.NewEncoder(w).Encode(videos)
+	var videosPublic []model.VideoPublic
+	for _, vid := range *videos {
+		videosPublic = append(videosPublic, model.GetPublicVideo(vid))
+	}
+	json.NewEncoder(w).Encode(videosPublic)
 }
 
 func getVideosFromUser(w http.ResponseWriter, r *http.Request) {
@@ -45,7 +49,11 @@ func getVideosFromUser(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(err)
 		config.Log.Error(err)
 	}
-	json.NewEncoder(w).Encode(videos)
+	var videosPublic []model.VideoPublic
+	for _, vid := range *videos {
+		videosPublic = append(videosPublic, model.GetPublicVideo(vid))
+	}
+	json.NewEncoder(w).Encode(videosPublic)
 }
 func createVideo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
