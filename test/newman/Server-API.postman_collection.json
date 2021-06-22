@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "9380a7c7-60de-42d8-a3fc-1c76b39216bb",
+		"_postman_id": "d0aa83be-d998-4de1-9aab-00336473acb6",
 		"name": "ASCIIflix - Server - API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1130,6 +1130,73 @@
 								"secure",
 								"video",
 								"deleteContent"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Video - Likes",
+			"item": [
+				{
+					"name": "Video - Like - Normal",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Token",
+								"value": "{{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/secure/video/createLike?id={{videoID}}",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"secure",
+								"video",
+								"createLike"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{videoID}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Video - Like - Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Token",
+								"value": "{{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/secure/video/deleteLike?id={{videoID}}",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"secure",
+								"video",
+								"deleteLike"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{videoID}}"
+								}
 							]
 						}
 					},

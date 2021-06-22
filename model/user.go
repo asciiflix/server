@@ -1,8 +1,6 @@
 package model
 
 import (
-	"fmt"
-
 	"github.com/dgrijalva/jwt-go"
 	"gorm.io/gorm"
 )
@@ -76,7 +74,6 @@ func (user User) GetPrivateUser() UserDetailsPrivate {
 	privateUser.Comments = user.Comments
 	privateUser.Likes = user.Likes
 	for _, videos := range user.Videos {
-		fmt.Println(videos.Likes)
 		privateUser.Videos = append(privateUser.Videos, GetPublicVideo(videos))
 	}
 	return privateUser
