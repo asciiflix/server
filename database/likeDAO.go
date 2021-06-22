@@ -9,7 +9,7 @@ import (
 )
 
 func CheckIfLiked(videoID uint, userID string) (bool, error) {
-	result := global_db.Where("video_id = ?", videoID).Where("user_id = ?", userID).Find(&model.Like{})
+	result := global_db.Where("video_id = ?", videoID).Where("user_id = ?", userID).First(&model.Like{})
 	if result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
 			return true, nil
@@ -23,7 +23,7 @@ func CheckIfLiked(videoID uint, userID string) (bool, error) {
 func CreateLike(videoID uint, userID string) error {
 
 	//Check if liked
-	result := global_db.Where("video_id = ?", videoID).Where("user_id = ?", userID).Find(&model.Like{})
+	result := global_db.Where("video_id = ?", videoID).Where("user_id = ?", userID).First(&model.Like{})
 	if result.Error != gorm.ErrRecordNotFound {
 		return errors.New("already liked")
 	}
