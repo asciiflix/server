@@ -90,3 +90,13 @@ func GetContentID(videoUUID string) (string, error) {
 	}
 	return video.VideoContentID, nil
 }
+
+func GetVideoID(videoUUID string) (uint, error) {
+	var video model.Video
+	result := global_db.Where("uuid = ?", videoUUID).First(&video)
+
+	if result.Error != nil {
+		return 0, result.Error
+	}
+	return video.ID, nil
+}

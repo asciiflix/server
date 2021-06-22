@@ -19,10 +19,16 @@ func getLiked(w http.ResponseWriter, r *http.Request) {
 
 	//Set Data
 	like.UserID = claims.User_ID
-	like.VideoID, _ = utils.ParseStringToUint(params["id"])
+	vidID, err := database.GetVideoID((params["id"]))
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		config.Log.Error(err)
+		return
+	}
+	like.VideoID = vidID
 
 	//Create Like
-	likeStatus, err := database.CheckIfLiked(params["id"], utils.ParseUintToString(like.VideoID))
+	likeStatus, err := database.CheckIfLiked(vidID, utils.ParseUintToString(like.UserID))
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		config.Log.Error(err)
@@ -41,10 +47,16 @@ func createLike(w http.ResponseWriter, r *http.Request) {
 
 	//Set Data
 	like.UserID = claims.User_ID
-	like.VideoID, _ = utils.ParseStringToUint(params["id"])
+	vidID, err := database.GetVideoID((params["id"]))
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		config.Log.Error(err)
+		return
+	}
+	like.VideoID = vidID
 
 	//Create Like
-	err := database.CreateLike(params["id"], utils.ParseUintToString(like.VideoID))
+	err = database.CreateLike(vidID, utils.ParseUintToString(like.UserID))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		config.Log.Error(err)
@@ -63,10 +75,16 @@ func deleteLike(w http.ResponseWriter, r *http.Request) {
 
 	//Set Data
 	like.UserID = claims.User_ID
-	like.VideoID, _ = utils.ParseStringToUint(params["id"])
+	vidID, err := database.GetVideoID((params["id"]))
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		config.Log.Error(err)
+		return
+	}
+	like.VideoID = vidID
 
 	//Create Like
-	err := database.DeleteLike(params["id"], utils.ParseUintToString(like.VideoID))
+	err = database.DeleteLike(vidID, utils.ParseUintToString(like.UserID))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		config.Log.Error(err)
