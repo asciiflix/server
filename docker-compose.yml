@@ -14,6 +14,8 @@ services:
     container_name: asciiflix_videos
     restart: always
     env_file: ./config.env
+    networks:
+      - backend
     volumes:
       - mongo-data:/data/db
   server:
