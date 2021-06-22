@@ -103,6 +103,16 @@ func GetPrivateUser(userID string) (*model.UserDetailsPrivate, error) {
 		return nil, result.Error
 	}
 
+	//Fix for getting Likes from User-Uploades Videos
+	var userVideos []model.Video
+	id, _ := utils.ParseStringToUint(userID)
+	result = global_db.Preload("Likes").Where("user_id = ?", id).Find(&userVideos)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	user.Videos = userVideos
+
 	//Parsing Object
 	privateUser := user.GetPrivateUser()
 
