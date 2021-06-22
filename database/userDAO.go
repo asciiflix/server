@@ -80,7 +80,7 @@ func GetUser(userID string) (*model.UserDetailsPublic, error) {
 	var user model.User
 
 	//Try Getting User Information from DB
-	result := global_db.Where("id = ?", userID).First(&user)
+	result := global_db.Preload("Videos").Preload("Likes").Preload("Comments").Where("id = ?", userID).First(&user)
 	//Check for Errors
 	if result.Error != nil {
 		return nil, result.Error
@@ -97,7 +97,7 @@ func GetPrivateUser(userID string) (*model.UserDetailsPrivate, error) {
 	var user model.User
 
 	//Try Getting User Information from DB
-	result := global_db.Where("id = ?", userID).First(&user)
+	result := global_db.Preload("Videos").Preload("Likes").Preload("Comments").Where("id = ?", userID).First(&user)
 	//Check for Errors
 	if result.Error != nil {
 		return nil, result.Error
@@ -154,7 +154,7 @@ func GetAllUsers() ([]model.UserDetailsPublic, error) {
 	var publicInformation []model.UserDetailsPublic
 
 	//Try to get all Users from DB
-	result := global_db.Find(&users)
+	result := global_db.Preload("Videos").Preload("Likes").Preload("Comments").Find(&users)
 	if result.Error != nil {
 		return nil, result.Error
 	}

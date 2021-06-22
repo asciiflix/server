@@ -1,6 +1,8 @@
 package model
 
 import (
+	"fmt"
+
 	"github.com/dgrijalva/jwt-go"
 	"gorm.io/gorm"
 )
@@ -25,7 +27,7 @@ type UserDetailsPrivate struct {
 	Email       string
 	Description string
 	Picture_ID  string
-	Videos      []Video
+	Videos      []VideoPublic
 	Comments    []Comment
 	Likes       []Like
 }
@@ -36,7 +38,7 @@ type UserDetailsPublic struct {
 	Name        string
 	Description string
 	Picture_ID  string
-	Videos      []Video
+	Videos      []VideoPublic
 }
 
 //Login Struct
@@ -58,8 +60,9 @@ func (user User) GetPublicUser() UserDetailsPublic {
 	publicUser.UserID = user.ID
 	publicUser.Description = user.Description
 	publicUser.Picture_ID = user.Picture_ID
-	publicUser.Videos = user.Videos
-
+	for _, videos := range user.Videos {
+		publicUser.Videos = append(publicUser.Videos, GetPublicVideo(videos))
+	}
 	return publicUser
 }
 
@@ -70,9 +73,11 @@ func (user User) GetPrivateUser() UserDetailsPrivate {
 	privateUser.Email = user.Email
 	privateUser.Description = user.Description
 	privateUser.Picture_ID = user.Picture_ID
-	privateUser.Videos = user.Videos
 	privateUser.Comments = user.Comments
 	privateUser.Likes = user.Likes
-
+	for _, videos := range user.Videos {
+		fmt.Println(videos.Likes)
+		privateUser.Videos = append(privateUser.Videos, GetPublicVideo(videos))
+	}
 	return privateUser
 }
