@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func CheckIfLiked(videoID string, userID string) (bool, error) {
+func CheckIfLiked(videoID uint, userID string) (bool, error) {
 	result := global_db.Where("video_id = ?", videoID).Where("user_id = ?", userID).Find(&model.Like{})
 	if result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
@@ -20,7 +20,7 @@ func CheckIfLiked(videoID string, userID string) (bool, error) {
 }
 
 //Create video
-func CreateLike(videoID string, userID string) error {
+func CreateLike(videoID uint, userID string) error {
 
 	//Check if liked
 	result := global_db.Where("video_id = ?", videoID).Where("user_id = ?", userID).Find(&model.Like{})
@@ -28,10 +28,7 @@ func CreateLike(videoID string, userID string) error {
 		return errors.New("already liked")
 	}
 
-	vidID, err := utils.ParseStringToUint(videoID)
-	if err != nil {
-		return err
-	}
+	vidID := videoID
 
 	useID, err := utils.ParseStringToUint(userID)
 	if err != nil {
@@ -51,7 +48,7 @@ func CreateLike(videoID string, userID string) error {
 	return nil
 }
 
-func DeleteLike(videoID string, userID string) error {
+func DeleteLike(videoID uint, userID string) error {
 	result := global_db.Where("video_id = ?", videoID).Where("user_id = ?", userID).Delete(&model.Like{})
 	if result.Error != nil {
 		return result.Error

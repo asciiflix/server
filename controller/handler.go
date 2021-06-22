@@ -45,7 +45,7 @@ func initHandler(router *mux.Router) {
 	protected.Path("/video/deleteVideo").Queries("id", "{id}").HandlerFunc(deleteVideo).Methods(http.MethodDelete)
 	protected.Path("/video/updateVideo").Queries("id", "{id}").HandlerFunc(updateVideo).Methods(http.MethodPut)
 	//Like
-	protected.Path("/video/getLike").Queries("id", "{id}").HandlerFunc(getLiked).Methods(http.MethodDelete)
+	protected.Path("/video/getLike").Queries("id", "{id}").HandlerFunc(getLiked).Methods(http.MethodGet)
 	protected.Path("/video/createLike").Queries("id", "{id}").HandlerFunc(createLike).Methods(http.MethodPost)
 	protected.Path("/video/deleteLike").Queries("id", "{id}").HandlerFunc(deleteLike).Methods(http.MethodDelete)
 	//Comments
