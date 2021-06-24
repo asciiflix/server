@@ -9,6 +9,7 @@ Every Endpoint is well documented in this Documentation :)
 | `/status`                     | GET     | -                                     | Get API Status                                         |
 | `/register`                   | POST    | [authentication](./authentication.md) | Register a User                                        |
 | `/login`                      | GET     | [authentication](./authentication.md) | User Login to get a JWT Token                          |
+| `/search`                     | GET     | [search](./search.md)                 | Search for Users and Videos                            |
 | `/secure/my_status`           | GET     | -                                     | (personalized) testing Status Page (testing jwt-token) |
 | `/secure/video/createContent` | POST    | [videoContent](./videoContent.md)     | Create/Upload Video Content, will be stored in MongoDB |
 | `/video/getContent`           | GET     | [videoContent](./videoContent.md)     | Get Video Content by UUID                              |
