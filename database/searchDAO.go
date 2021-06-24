@@ -13,14 +13,14 @@ func GetSearchResult(query string) (*model.SearchResult, error) {
 
 	//Search for Users (name, description)
 	var tmpUsers []model.User
-	db_result := global_db.Preload("Videos").Where("name LIKE ?", "%"+query+"%").Or("description LIKE ?", "%"+query+"%").Find(&tmpUsers)
+	db_result := global_db.Preload("Videos").Where("name ILIKE ?", "%"+query+"%").Or("description ILIKE ?", "%"+query+"%").Find(&tmpUsers)
 	if db_result.Error != nil {
 		return nil, db_result.Error
 	}
 
 	//Search for Videos (title, uuid, description)
 	var tmpVideos []model.Video
-	db_result = global_db.Where("title LIKE ?", "%"+query+"%").Or("uuid LIKE ?", "%"+query+"%").Or("description LIKE ?", "%"+query+"%").Find(&tmpVideos)
+	db_result = global_db.Where("title ILIKE ?", "%"+query+"%").Or("uuid ILIKE ?", "%"+query+"%").Or("description ILIKE ?", "%"+query+"%").Find(&tmpVideos)
 	if db_result.Error != nil {
 		return nil, db_result.Error
 	}
