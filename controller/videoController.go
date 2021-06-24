@@ -3,6 +3,7 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/asciiflix/server/config"
@@ -38,6 +39,23 @@ func getVideos(w http.ResponseWriter, r *http.Request) {
 		videosPublic = append(videosPublic, model.GetPublicVideo(vid))
 	}
 	json.NewEncoder(w).Encode(videosPublic)
+}
+
+func getRecomendations(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(r)
+	limit, _ := strconv.Atoi(params["limit"])
+	recomendations, err := database.GetRecomendations(limit)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err)
+		config.Log.Error(err)
+	}
+	var recomendationsPublic []model.VideoPublic
+	for _, vid := range *recomendations {
+		recomendationsPublic = append(recomendationsPublic, model.GetPublicVideo(vid))
+	}
+	json.NewEncoder(w).Encode(recomendationsPublic)
 }
 
 func getVideosFromUser(w http.ResponseWriter, r *http.Request) {

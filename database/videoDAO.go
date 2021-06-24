@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/asciiflix/server/model"
+	"gorm.io/gorm/clause"
 )
 
 //Create video
@@ -32,6 +33,15 @@ func GetVideo(videoId string) (*model.Video, error) {
 func GetVideos() (*[]model.Video, error) {
 	var videos []model.Video
 	result := global_db.Find(&videos)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &videos, nil
+}
+
+func GetRecomendations(limit int) (*[]model.Video, error) {
+	var videos []model.Video
+	result := global_db.Limit(limit).Clauses(clause.OrderBy{Expression: clause.Expr{SQL: "RANDOM()"}}).Find(&videos)
 	if result.Error != nil {
 		return nil, result.Error
 	}
