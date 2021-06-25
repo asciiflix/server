@@ -2,11 +2,13 @@ package controller
 
 import (
 	"encoding/json"
+	"image/gif"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/asciiflix/server/config"
+	"github.com/asciiflix/server/converter"
 	"github.com/asciiflix/server/database"
 	"github.com/asciiflix/server/model"
 	"github.com/gofrs/uuid"
@@ -97,6 +99,82 @@ func createVideo(w http.ResponseWriter, r *http.Request) {
 		config.Log.Error(err)
 		return
 	}
+	claims, _ := getJWTClaims(r)
+
+	//Set User
+	video.VideoStats.UserID = claims.User_ID
+
+	//Set defaults
+	video.VideoStats.UploadDate = time.Now()
+	video.VideoStats.Views = 0
+
+	//Create Video content
+	result := database.CreateVideoContent(&video.VideoContent)
+	if result["message"] != "Successfully created VideoContent" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	video.VideoStats.VideoContentID = result["_id"].(primitive.ObjectID).Hex()
+
+	video.VideoStats.UUID, _ = uuid.NewV4()
+	//Create Video
+	err = database.CreateVideo(video.VideoStats)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
+		config.Log.Error(err)
+		return
+	}
+
+	//Response
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(map[string]interface{}{"videoID": video.VideoStats.UUID})
+
+}
+
+func createVideoFromGif(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	video := model.VideoFull{}
+
+	//Parse video from request body
+	video.VideoStats.Title = r.FormValue("title")
+	video.VideoStats.Description = r.FormValue("description")
+
+	//Parse multiform
+	err := r.ParseMultipartForm(32 << 20)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		config.Log.Error(err)
+		return
+	}
+	//Create gif file
+	file, _, err := r.FormFile("gif")
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		config.Log.Error(err)
+		return
+	}
+	defer file.Close()
+
+	//Decode gif file
+	gifFile, err := gif.DecodeAll(file)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		config.Log.Error(err)
+		return
+	}
+	//Convert gif file
+	video.VideoContent.Video, err = converter.ConvertGif(*gifFile, 100, 100)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		config.Log.Error(err)
+		return
+	}
+
 	claims, _ := getJWTClaims(r)
 
 	//Set User
