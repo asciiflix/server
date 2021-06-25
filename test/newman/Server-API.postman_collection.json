@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "716ccf26-e9ab-42cf-a611-e641a1fb6788",
+		"_postman_id": "bdcb2d7b-ba57-4ec6-88c5-8c25fcc7a9f7",
 		"name": "ASCIIflix - Server - API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -980,6 +980,104 @@
 							"path": [
 								"video",
 								"getVideos"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Video - Recomendations",
+			"item": [
+				{
+					"name": "Video Recomendations - Logged out",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status Code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"var jsonData = JSON.parse(responseBody);\r",
+									"\r",
+									"pm.test(\"Limit is correct\", function() {\r",
+									"    pm.expect(jsonData.length).to.eql(1)\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/video/getRecomendations?limit=1",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"video",
+								"getRecomendations"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Video Recomendations - Logged In",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status Code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"var jsonData = JSON.parse(responseBody);\r",
+									"\r",
+									"pm.test(\"Limit is correct\", function() {\r",
+									"    pm.expect(jsonData.length).to.eql(1)\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Token",
+								"value": "{{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/secure/video/getUserRecomendations?limit=1",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"secure",
+								"video",
+								"getUserRecomendations"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "1"
+								}
 							]
 						}
 					},
