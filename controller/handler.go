@@ -53,7 +53,8 @@ func initHandler(router *mux.Router) {
 	protected.Path("/video/deleteLike").Queries("id", "{id}").HandlerFunc(deleteLike).Methods(http.MethodDelete)
 	//Comments
 	protected.Path("/video/createComment").Queries("id", "{id}").HandlerFunc(createComment).Methods(http.MethodPost)
-
+	//Recomendations
+	protected.Path("/video/getUserRecomendations").Queries("limit", "{limit}").HandlerFunc(createComment).Methods(http.MethodPost)
 }
 
 func status(w http.ResponseWriter, r *http.Request) {

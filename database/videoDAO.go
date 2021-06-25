@@ -48,6 +48,15 @@ func GetRecomendations(limit int) (*[]model.Video, error) {
 	return &videos, nil
 }
 
+func GetRecomendationsForUser(limit int, uuid uint) (*[]model.Video, error) {
+	var videos []model.Video
+	result := global_db.Limit(limit).Where("user_id != ?", uuid).Clauses(clause.OrderBy{Expression: clause.Expr{SQL: "RANDOM()"}}).Find(&videos)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &videos, nil
+}
+
 //Get all Videos from one user
 func GetVideosFromUser(userID string) (*[]model.Video, error) {
 	var videos []model.Video
