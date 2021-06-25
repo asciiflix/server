@@ -3,6 +3,7 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/asciiflix/server/config"
@@ -40,6 +41,34 @@ func getVideos(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(videosPublic)
 }
 
+func getRecomendations(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(r)
+	limit, _ := strconv.Atoi(params["limit"])
+
+	var recomendations *[]model.Video
+	var err error
+
+	if len(r.Header["Token"]) != 0 {
+		claims, _ := getJWTClaims(r)
+		uuid := claims.User_ID
+		recomendations, err = database.GetRecomendationsForUser(limit, uuid)
+	} else {
+		recomendations, err = database.GetRecomendations(limit)
+	}
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err)
+		config.Log.Error(err)
+	}
+	var recomendationsPublic []model.VideoPublic
+	for _, vid := range *recomendations {
+		recomendationsPublic = append(recomendationsPublic, model.GetPublicVideo(vid))
+	}
+	json.NewEncoder(w).Encode(recomendationsPublic)
+}
+
 func getVideosFromUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
@@ -55,6 +84,7 @@ func getVideosFromUser(w http.ResponseWriter, r *http.Request) {
 	}
 	json.NewEncoder(w).Encode(videosPublic)
 }
+
 func createVideo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	video := model.VideoFull{}

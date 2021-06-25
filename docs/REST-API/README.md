@@ -16,6 +16,8 @@ Every Endpoint is well documented in this Documentation :)
 | `/secure/video/deleteContent` | DELETE  | [videoContent](./videoContent.md)     | Delete Video Content by UUID                           |
 | `/video/getVideo`             | GET     | [video](./video.md)                   | Get video by UUID                                      |
 | `/video/getVideos`            | GET     | [video](./video.md)                   | Get all videos                                         |
+| `/video/getRecomendations`    | GET     | [video](./video.md)                   | Get Recomendations                                     |
+| `/video/getUserRecomendations`| GET     | [video](./video.md)                   | Get Recomendations by User                             |
 | `/secure/video/createVideo`   | POST    | [video](./video.md)                   | Create video by UUID                                   |
 | `/secure/video/deleteVideo`   | DELETE  | [video](./video.md)                   | Delete video by UUID                                   |
 | `/secure/video/updateVideo`   | PUT     | [video](./video.md)                   | Edit video data by UUID                                |
