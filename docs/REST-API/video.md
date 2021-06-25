@@ -109,3 +109,14 @@ Send the updated values as json.
   "Description": "Updated description"
 }
 ```
+
+# Get Recomendations
+
+To get Reomendations (optionally for a user), returning a list of videos
+
+## Usage
+
+Simply call ``/video/getRecomendations?limit={{limit}}`` or ``/video/getUserRecomendations?limit={{limit}}`` with a given JWT token as a header.
+
+The response will then be an array (the size of the limit, or less) for Video objects. 
+If no videos exist, the response will be null, however that really shouldn't ever be the case.
