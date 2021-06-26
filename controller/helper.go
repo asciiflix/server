@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/asciiflix/server/config"
+	"github.com/asciiflix/server/database"
 	"github.com/asciiflix/server/model"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/sirupsen/logrus"
@@ -77,6 +78,15 @@ func jwtPreHandler(next http.Handler) http.Handler {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusUnauthorized)
 			json.NewEncoder(w).Encode(map[string]interface{}{"message": "JWT Token Expired"})
+			return
+		}
+
+		//Check for JWT Blacklist
+		onBlacklist, _ := database.CheckJwtOnBlacklist(r.Header["Token"][0])
+		if onBlacklist {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(map[string]interface{}{"message": "JWT Token on Blacklist"})
 			return
 		}
 

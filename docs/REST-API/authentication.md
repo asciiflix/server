@@ -58,6 +58,9 @@ If you using Credentials for a User which does not exists, you will get:
 }
 ````
 
+# Logout
+To add a JWT-Token to our Blacklist simply call ``/secure/logout``. The used JWT token will be added to our blacklist to prevent further use.
+
 # Use Secure Endpoints
 If you want to access secure endpoints like ``/secure/my_status``, you will need a valid JWT-Token. <br>
 No JWT-Token? -> How to get a JWT-Token, please read:

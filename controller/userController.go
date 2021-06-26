@@ -59,6 +59,22 @@ func login(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+//Logiut
+func logout(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	//Get jwt
+	jwt := r.Header["Token"][0]
+
+	//Add jwt to blacklist
+	err := database.Logout(jwt)
+	if err != nil {
+		basicUserErrorHandler(err, w)
+		return
+	}
+
+}
+
 //Get User Information by ID
 func getUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")

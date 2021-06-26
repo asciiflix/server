@@ -56,6 +56,8 @@ func initHandler(router *mux.Router) {
 	protected.Path("/video/createComment").Queries("id", "{id}").HandlerFunc(createComment).Methods(http.MethodPost)
 	//Recomendations
 	protected.Path("/video/getUserRecomendations").Queries("limit", "{limit}").HandlerFunc(getRecomendations).Methods(http.MethodGet)
+	//Logout
+	protected.Path("/logout").HandlerFunc(logout).Methods(http.MethodGet)
 }
 
 func status(w http.ResponseWriter, r *http.Request) {
