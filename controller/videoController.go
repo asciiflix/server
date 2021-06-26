@@ -167,7 +167,7 @@ func createVideoFromGif(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//Convert gif file
-	video.VideoContent.Video, err = converter.ConvertGif(*gifFile, 100, 100)
+	video.VideoContent.Video, err = converter.ConvertGif(*gifFile, 40, 120)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(err.Error())

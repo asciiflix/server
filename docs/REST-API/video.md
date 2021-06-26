@@ -8,9 +8,10 @@ Keep in mind the create/update/delete video Endpoints are behind `/secure`, so y
 | --------------------------- | ------- | ---------------------------- | ----------------------- |
 | `/video/getVideo`           | GET     | [getVideo](#get-video)       | Get video by UUID       |
 | `/video/getVideos`          | GET     | [getVideos](#get-videos)     | Get all videos          |
-| `/secure/video/createVideo` | POST    | [createVideo](#create-video) | Create video by UUID    |
+| `/secure/video/createVideo` | POST    | [createVideo](#create-video) | Create video            |
 | `/secure/video/deleteVideo` | DELETE  | [deleteVideo](#update-video) | Delete video by UUID    |
 | `/secure/video/updateVideo` | PUT     | [updateVideo](#delete-video) | Edit video data by UUID |
+| `/secure/video/uploadGif`   | POST    | [UploadGif](#upload-gif)     | Upload gif              |
 
 # Get video
 
@@ -116,7 +117,47 @@ To get Reomendations (optionally for a user), returning a list of videos
 
 ## Usage
 
-Simply call ``/video/getRecomendations?limit={{limit}}`` or ``/video/getUserRecomendations?limit={{limit}}`` with a given JWT token as a header.
+Simply call `/video/getRecomendations?limit={{limit}}` or `/video/getUserRecomendations?limit={{limit}}` with a given JWT token as a header.
 
-The response will then be an array (the size of the limit, or less) for Video objects. 
+The response will then be an array (the size of the limit, or less) for Video objects.
 If no videos exist, the response will be null, however that really shouldn't ever be the case.
+
+# Upload gif
+
+You can upload/create a Video at the the Endpoint `/secure/video/uploadGif` with a POST request and a given JWT token as a header. Use a `multipart/form-data` with the keys `title`, `description` and `gif`. <br>
+Here is an Example:
+
+## Usage
+
+| Key           | Value                  | Type |
+| ------------- | ---------------------- | ---- |
+| `title`       | Your video title       | Text |
+| `description` | Your video description | Text |
+| `gif`         | Your gif file          | File |
+
+Note: The following html example illustrates the usage of our API, but won't work because a JWT token is missing.
+
+```html
+<form
+  action="https://api.asciiflix.tech/secure/video/uploadGif"
+  enctype="multipart/form-data"
+  method="post"
+>
+  <p>
+    Video Title? <input type="text" name="title" /><br />
+    Video Description? <input type="text" name="description" /><br />
+    Gif File:<input type="file" name="gif" /><br />
+    <input type="submit" value="Upload" /> <input type="reset" />
+  </p>
+</form>
+```
+
+## Response
+
+You will get a UUID which is really important. Please save the `videoID` to properly connect the other endpoints later.
+
+```json
+{
+  "videoID": "bb2d47c5-b1b0-453e-ac98-b270bc5e9ee0"
+}
+```
