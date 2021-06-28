@@ -75,6 +75,31 @@ func LoginUser(login_data model.UserLogin) map[string]interface{} {
 	return response
 }
 
+//Add JWT to blacklist
+func Logout(jwt string) error {
+	jwtBlacklistItem := model.JwtBlacklist{
+		Jwt: jwt,
+	}
+
+	result := global_db.Create(&jwtBlacklistItem)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+//Check if JWT is on blacklist
+func CheckJwtOnBlacklist(jwt string) (bool, error) {
+	result := global_db.Where("jwt = ?", jwt).First(&model.JwtBlacklist{})
+
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			return false, nil
+		}
+	}
+	return true, result.Error
+}
+
 //Get User Information by ID
 func GetUser(userID string) (*model.UserDetailsPublic, error) {
 	var user model.User

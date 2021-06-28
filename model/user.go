@@ -45,6 +45,12 @@ type UserLogin struct {
 	Password string
 }
 
+//Login Struct
+type JwtBlacklist struct {
+	ID  uint `gorm:"primaryKey"`
+	Jwt string
+}
+
 //Struct for Users JWT Token
 type UserClaim struct {
 	jwt.StandardClaims

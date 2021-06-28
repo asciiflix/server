@@ -45,6 +45,7 @@ func initHandler(router *mux.Router) {
 	protected.Path("/user/deleteUser").Queries("id", "{id}").HandlerFunc(deleteUser).Methods(http.MethodDelete)
 	//Video
 	protected.Path("/video/createVideo").HandlerFunc(createVideo).Methods(http.MethodPost)
+	protected.Path("/video/uploadGif").HandlerFunc(createVideoFromGif).Methods(http.MethodPost)
 	protected.Path("/video/deleteVideo").Queries("id", "{id}").HandlerFunc(deleteVideo).Methods(http.MethodDelete)
 	protected.Path("/video/updateVideo").Queries("id", "{id}").HandlerFunc(updateVideo).Methods(http.MethodPut)
 	//Like
@@ -55,6 +56,8 @@ func initHandler(router *mux.Router) {
 	protected.Path("/video/createComment").Queries("id", "{id}").HandlerFunc(createComment).Methods(http.MethodPost)
 	//Recomendations
 	protected.Path("/video/getUserRecomendations").Queries("limit", "{limit}").HandlerFunc(getRecomendations).Methods(http.MethodGet)
+	//Logout
+	protected.Path("/logout").HandlerFunc(logout).Methods(http.MethodGet)
 }
 
 func status(w http.ResponseWriter, r *http.Request) {
