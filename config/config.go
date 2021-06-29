@@ -22,9 +22,11 @@ type MongoDBConfig struct {
 }
 
 type APIConfig struct {
-	Port     int    `mapstructure:"API_PORT"`
-	JWTKey   string `mapstructure:"JWT_PRIVATE_KEY"`
-	LogLevel int    `mapstructure:"LOG_LEVEL"`
+	Port        int    `mapstructure:"API_PORT"`
+	JWTKey      string `mapstructure:"JWT_PRIVATE_KEY"`
+	LogLevel    int    `mapstructure:"LOG_LEVEL"`
+	ASCIIWidth  int    `mapstructure:"ASCII_WIDTH"`
+	ASCIIHeight int    `mapstructure:"ASCII_HEIGHT"`
 }
 
 var Version = "development"

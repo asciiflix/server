@@ -30,9 +30,10 @@ func basicVideoErrorHandler(err error, w http.ResponseWriter) error {
 		if err.Error() == "record not found" || err.Error() == "video does not exist" {
 			w.WriteHeader(http.StatusNotFound)
 
-		} else if err.Error() == "id doesn´t match" {
+		} else if err.Error() == "id doesn´t match" || err.Error() == "user does not match" {
 			w.WriteHeader(http.StatusUnauthorized)
-
+		} else {
+			w.WriteHeader(http.StatusBadRequest)
 		}
 		//Log every error
 		config.Log.Error(err)

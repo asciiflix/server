@@ -4,14 +4,20 @@ Keep in mind the create/update/delete video Endpoints are behind `/secure`, so y
 
 # Overview
 
-| API-Endpoint                | Methods | Doc                          | Description             |
-| --------------------------- | ------- | ---------------------------- | ----------------------- |
-| `/video/getVideo`           | GET     | [getVideo](#get-video)       | Get video by UUID       |
-| `/video/getVideos`          | GET     | [getVideos](#get-videos)     | Get all videos          |
-| `/secure/video/createVideo` | POST    | [createVideo](#create-video) | Create video            |
-| `/secure/video/deleteVideo` | DELETE  | [deleteVideo](#update-video) | Delete video by UUID    |
-| `/secure/video/updateVideo` | PUT     | [updateVideo](#delete-video) | Edit video data by UUID |
-| `/secure/video/uploadGif`   | POST    | [UploadGif](#upload-gif)     | Upload gif              |
+| API-Endpoint                          | Methods | Doc                                          | Description              |
+| ------------------------------------- | ------- | -------------------------------------------- | ------------------------ |
+| `/video/getVideo`                     | GET     | [getVideo](#get-video)                       | Get video by UUID        |
+| `/video/getVideos`                    | GET     | [getVideos](#get-videos)                     | Get all videos           |
+| `/secure/video/createVideo`           | POST    | [createVideo](#create-video)                 | Create video             |
+| `/secure/video/deleteVideo`           | DELETE  | [deleteVideo](#update-video)                 | Delete video by UUID     |
+| `/secure/video/updateVideo`           | PUT     | [updateVideo](#delete-video)                 | Edit video data by UUID  |
+| `/video/getRecomendations`            | GET     | [getRecomendations](#get-recomendations)     | Get recommendations      |
+| `/secure/video/getUserRecomendations` | GET     | [getUserRecomendations](#get-recomendations) | Get user recommendations |
+| `/secure/video/uploadGif`             | POST    | [UploadGif](#upload-gif)                     | Upload gif               |
+| `/secure/video/createComment`         | POST    | [createComment](#create-comment)             | Create comment           |
+| `/secure/video/getLike`               | GET     | [getLike](#get-like)                         | Get Like                 |
+| `/secure/video/createLike`            | POST    | [createLike](#create-like)                   | Create Like              |
+| `/secure/video/deleteLike`            | DELETE  | [deleteLike](#delete-like)                   | Delete Like              |
 
 # Get video
 
@@ -113,7 +119,7 @@ Send the updated values as json.
 
 # Get Recomendations
 
-To get Reomendations (optionally for a user), returning a list of videos
+To get recommendations (optionally for a user), returning a list of videos
 
 ## Usage
 
@@ -161,3 +167,34 @@ You will get a UUID which is really important. Please save the `videoID` to prop
   "videoID": "bb2d47c5-b1b0-453e-ac98-b270bc5e9ee0"
 }
 ```
+
+# Create comment
+
+You can create a comment at the the Endpoint `/secure/video/createComment?id={{video-uuid}}` with a POST request. Use a json Object with the key `VideoStats`
+for video stats and the key `VideoContent` for video content. <br>
+Here is an Example:
+
+```json
+{
+  "Content": "This is a comment"
+}
+```
+
+# Get Like
+
+To get the status of a like use the Endpoint `/secure/video/getLike?id={{video-uuid}}` with a GET request.
+
+## Response
+
+```json
+{
+    "likedStatus": false
+}
+```
+
+# Create Like
+To add a like to a video simply call the endpoint `/secure/video/createLike?id={{video-uuid}}`
+
+# Delete Like
+To delete a like to a video simply call the endpoint `/secure/video/deleteLike?id={{video-uuid}}`
+

@@ -18,13 +18,15 @@ type frame struct {
 	Rows []string `json:"Rows"`
 }
 
-func ConvertGif(gifToConvert gif.GIF, height int, width int) (vidJson map[string]interface{}, err error) {
+func ConvertGif(gifToConvert gif.GIF, width int, height int) (vidJson map[string]interface{}, err error) {
 
 	//Build image slice
 	var frames []image.Image
+
 	for _, frame := range gifToConvert.Image {
 		//Resize Image
 		resizedFrame := resize.Resize(uint(width), uint(height), frame, resize.Lanczos3)
+
 		//Add to slice
 		frames = append(frames, resizedFrame)
 	}

@@ -12,10 +12,10 @@ func CheckIfLiked(videoID uint, userID string) (bool, error) {
 	result := global_db.Where("video_id = ?", videoID).Where("user_id = ?", userID).First(&model.Like{})
 	if result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
-			return true, nil
+			return false, nil
 		}
 	}
-	return false, result.Error
+	return true, result.Error
 
 }
 
