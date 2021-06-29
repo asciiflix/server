@@ -68,12 +68,17 @@ func GetVideosFromUser(userID string) (*[]model.Video, error) {
 }
 
 //Update video by id
-func UpdateVideo(updateVideo model.Video) error {
+func UpdateVideo(updateVideo model.Video, userId uint) error {
 	//Check if Video exists by ID
 	var videoToUpdate model.Video
 	result := global_db.Where("uuid = ?", updateVideo.UUID).First(&videoToUpdate)
 	if result.Error != nil {
 		return errors.New("video does not exist")
+	}
+
+	if userId != videoToUpdate.UserID {
+		fmt.Println(videoToUpdate)
+		return errors.New("user does not match")
 	}
 
 	//Updates Values in Database

@@ -224,7 +224,7 @@ func updateVideo(w http.ResponseWriter, r *http.Request) {
 	video.UUID, _ = uuid.FromString(params["id"])
 
 	//Update User in DB
-	err = database.UpdateVideo(video)
+	err = database.UpdateVideo(video, claims.User_ID)
 	if err != nil {
 		basicVideoErrorHandler(err, w)
 		return
@@ -259,8 +259,7 @@ func deleteVideo(w http.ResponseWriter, r *http.Request) {
 	//Try to delete video stats
 	err = database.DeleteVideo(params["id"], claims.User_ID)
 	if err != nil {
-		config.Log.Error(err)
-		w.WriteHeader(http.StatusNotFound)
+		basicVideoErrorHandler(err, w)
 		return
 	}
 	result := database.DeleteVideoContent(contentID)

@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "76ea546b-528b-4baf-945e-3613a046a77f",
+		"_postman_id": "6a7e6ae1-a428-432e-91f3-d430703e690d",
 		"name": "ASCIIflix - Server - API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -626,7 +626,8 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									""
+									"pm.globals.set(\"videoTitle\", \"Nyan Cat\");\r",
+									"pm.globals.set(\"videoDescription\", \"Nyan Cat is the name of a YouTube video uploaded in April 2011, which became an internet meme. The video merged a Japanese pop song with an animated cartoon cat with a Pop-Tart for a torso flying through space and leaving a rainbow trail behind. The video ranked at number 5 on the list of most viewed YouTube videos in 2011.\");"
 								],
 								"type": "text/javascript"
 							}
@@ -665,16 +666,16 @@
 								{
 									"key": "gif",
 									"type": "file",
-									"src": "data/nyancat.gif"
+									"src": "/D:/Dev/asciiflix/server/test/newman/data/nyancat.gif"
 								},
 								{
 									"key": "title",
-									"value": "Nyan Cat",
+									"value": "{{videoTitle}}",
 									"type": "text"
 								},
 								{
 									"key": "description",
-									"value": "Nyan Cat is the name of a YouTube video uploaded in April 2011, which became an internet meme. The video merged a Japanese pop song with an animated cartoon cat with a Pop-Tart for a torso flying through space and leaving a rainbow trail behind. The video ranked at number 5 on the list of most viewed YouTube videos in 2011.",
+									"value": "{{videoDescription}}",
 									"type": "text"
 								}
 							],
@@ -1306,101 +1307,6 @@
 						}
 					},
 					"response": []
-				},
-				{
-					"name": "Video - Like - Delete",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status Code is 201\", function() {\r",
-									"    pm.response.to.have.status(201);\r",
-									"});\r",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Token",
-								"value": "{{jwtToken}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{api_url}}/secure/video/deleteLike?id={{videoID}}",
-							"host": [
-								"{{api_url}}"
-							],
-							"path": [
-								"secure",
-								"video",
-								"deleteLike"
-							],
-							"query": [
-								{
-									"key": "id",
-									"value": "{{videoID}}"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Video - Like - Get Status after Delete",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status Code is 301\", function() {\r",
-									"    pm.response.to.have.status(302);\r",
-									"});\r",
-									"\r",
-									"var jsonData = JSON.parse(responseBody);\r",
-									"\r",
-									"pm.test(\"Recieving Correct Like Status\", function () {\r",
-									"    pm.expect(jsonData.likedStatus).equal(false);\r",
-									"}); "
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Token",
-								"value": "{{jwtToken}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{api_url}}/secure/video/getLike?id={{videoID}}",
-							"host": [
-								"{{api_url}}"
-							],
-							"path": [
-								"secure",
-								"video",
-								"getLike"
-							],
-							"query": [
-								{
-									"key": "id",
-									"value": "{{videoID}}"
-								}
-							]
-						}
-					},
-					"response": []
 				}
 			]
 		},
@@ -1914,6 +1820,56 @@
 								"secure",
 								"video",
 								"deleteLike"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{videoID}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Video - Like - Get Status after Delete",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status Code is 301\", function() {\r",
+									"    pm.response.to.have.status(302);\r",
+									"});\r",
+									"\r",
+									"var jsonData = JSON.parse(responseBody);\r",
+									"\r",
+									"pm.test(\"Recieving Correct Like Status\", function () {\r",
+									"    pm.expect(jsonData.likedStatus).equal(false);\r",
+									"}); "
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Token",
+								"value": "{{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/secure/video/getLike?id={{videoID}}",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"secure",
+								"video",
+								"getLike"
 							],
 							"query": [
 								{
