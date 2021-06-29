@@ -7,7 +7,6 @@ import (
 	"github.com/asciiflix/server/config"
 	"github.com/asciiflix/server/database"
 	"github.com/asciiflix/server/model"
-	"github.com/asciiflix/server/utils"
 	"github.com/gorilla/mux"
 )
 
@@ -40,7 +39,7 @@ func createComment(w http.ResponseWriter, r *http.Request) {
 
 	//Set Data
 	comment.UserID = claims.User_ID
-	comment.VideoID, _ = utils.ParseStringToUint(params["id"])
+	comment.VideoID, _ = database.GetVideoID(params["id"])
 
 	//Create Like
 	err = database.CreateComment(comment)
