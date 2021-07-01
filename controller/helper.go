@@ -10,7 +10,6 @@ import (
 	"github.com/asciiflix/server/database"
 	"github.com/asciiflix/server/model"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/sirupsen/logrus"
 )
 
 //Getting JWTClaims from Header without Validation
@@ -91,14 +90,7 @@ func jwtPreHandler(next http.Handler) http.Handler {
 		}
 
 		//Not Checking for errors in claims
-		if claims, _ := token.Claims.(*model.UserClaim); token.Valid {
-
-			//Log JWT-Sample-Payload for testing
-			config.Log.WithFields(logrus.Fields{
-				"user_email": claims.User_email,
-				"user_id":    claims.User_ID,
-			}).Trace("JWT-Payload")
-
+		if token != nil {
 			next.ServeHTTP(w, r)
 			return
 		}

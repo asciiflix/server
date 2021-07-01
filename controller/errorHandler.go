@@ -13,6 +13,8 @@ func basicUserErrorHandler(err error, w http.ResponseWriter) error {
 			w.WriteHeader(http.StatusNotFound)
 		} else if err.Error() == "id doesn´t match" {
 			w.WriteHeader(http.StatusUnauthorized)
+		} else if err.Error() == "email already in use" {
+			w.WriteHeader(http.StatusConflict)
 		} else {
 			w.WriteHeader(http.StatusBadRequest)
 		}
