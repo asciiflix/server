@@ -2,6 +2,7 @@ package converter
 
 import (
 	"encoding/json"
+	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
@@ -69,8 +70,11 @@ func ConvertGif(gifToConvert gif.GIF, width int, height int) (vidJson map[string
 				intensity := (r + g + b) * a / 255
 
 				//Map color intensity to char and add it to row
+				//<pre color=rgba(red, green, blue, alpha)><pre>
 				step := float64(255 * 3 / (len(chars) - 1))
+				video.Frames[frameIndex].Rows[i] += fmt.Sprintf("<pre style='color:rgb(%d,%d,%d);'>", r, g, b)
 				video.Frames[frameIndex].Rows[i] += getChar(chars[roundValue(float64(intensity)/step)])
+				video.Frames[frameIndex].Rows[i] += "</pre>"
 			}
 		}
 	}
