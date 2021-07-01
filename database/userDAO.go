@@ -153,6 +153,13 @@ func UpdateUser(updateUser *model.User) error {
 		return errors.New("user does not exist")
 	}
 
+	//Users exists, check for already used email
+	if updateUser.Email != "" {
+		if err := global_db.Where("email = ?", updateUser.Email).First(&model.User{}).Error; err != gorm.ErrRecordNotFound {
+			return errors.New("email already in use")
+		}
+	}
+
 	//Users exists, check if password-field has chanaged -> bcrypt time
 	if updateUser.Password != "" {
 		err := utils.GenerateBCryptFromPassword(updateUser)
