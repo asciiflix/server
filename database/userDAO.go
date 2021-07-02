@@ -51,7 +51,7 @@ func LoginUser(login_data model.UserLogin) map[string]interface{} {
 		User_ID:    user.ID,
 		User_email: user.Email,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour ^ 24).Unix(),
+			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
 			IssuedAt:  time.Now().Unix(),
 			Issuer:    "api.asciiflix.tech",
 		},
