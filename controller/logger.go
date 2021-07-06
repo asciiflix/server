@@ -12,7 +12,7 @@ func logRequests(next http.Handler) http.Handler {
 		//Log Incoming Requests to Logger
 		config.Log.WithFields(logrus.Fields{
 			"endpoint": r.URL.Path,
-			"ip":       r.RemoteAddr,
+			"agent":    r.UserAgent(),
 		}).Trace("New Request")
 
 		next.ServeHTTP(w, r)
