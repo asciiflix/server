@@ -8,6 +8,7 @@ import (
 	"github.com/asciiflix/server/model"
 	"github.com/asciiflix/server/utils"
 	"github.com/dgrijalva/jwt-go"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"gorm.io/gorm"
 )
 
@@ -180,8 +181,38 @@ func UpdateUser(updateUser *model.User) error {
 
 //Delete a complete User by ID
 func DeleteUser(userID string) error {
+
+	//Delete Every Comment from this User
+	result := global_db.Model(model.Comment{}).Where("user_id = ?", userID).Delete(&model.Comment{})
+	if result.Error != nil {
+		return result.Error
+	}
+
+	//Delete Every Like from this User
+	result = global_db.Model(model.Like{}).Where("user_id = ?", userID).Delete(&model.Like{})
+	if result.Error != nil {
+		return result.Error
+	}
+
+	//Delete Every Video from this User
+	userVideo, err := GetVideosFromUser(userID)
+	if err != nil {
+		return err
+	}
+
+	for _, video := range *userVideo {
+		//Delete every video-content
+		id, err := primitive.ObjectIDFromHex(video.VideoContentID)
+		if err != nil {
+			return err
+		}
+		DeleteVideoContent(id)
+		newUserID, _ := utils.ParseStringToUint(userID)
+		DeleteVideo(video.UUID.String(), newUserID)
+	}
+
 	//Try to Delete User by ID in Database
-	result := global_db.Delete(&model.User{}, userID)
+	result = global_db.Delete(&model.User{}, userID)
 	if result.Error != nil {
 		return result.Error
 	}
