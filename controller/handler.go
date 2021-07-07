@@ -34,7 +34,6 @@ func initHandler(router *mux.Router) {
 	//Secure (JWT) Endpoints
 	protected := router.PathPrefix("/secure").Subrouter()
 	protected.Use(jwtPreHandler)
-	protected.Use(logRequests)
 	protected.Path("/my_status").HandlerFunc(status).Methods(http.MethodGet)
 	//Video-Content
 	protected.Path("/video/createContent").HandlerFunc(createVideoContent).Methods(http.MethodPost)

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"image"
 	"image/color"
+	"image/draw"
 	"image/gif"
 	"math"
 	"reflect"
@@ -20,12 +21,25 @@ type frame struct {
 
 func ConvertGif(gifToConvert gif.GIF, width int, height int) (vidJson map[string]interface{}, err error) {
 
+	imgWidth, imgHeight := getGifDimensions(&gifToConvert)
+
+	//Get default image
+	priorFrame := image.NewRGBA(image.Rect(0, 0, imgWidth, imgHeight))
+	draw.Draw(priorFrame, priorFrame.Bounds(), gifToConvert.Image[0], image.Point{X: 0, Y: 0}, draw.Src)
+
 	//Build image slice
 	var frames []image.Image
 
 	for _, frame := range gifToConvert.Image {
+		//Draw over priorFrame
+		draw.Draw(priorFrame, priorFrame.Bounds(), frame, image.Point{X: 0, Y: 0}, draw.Over)
+		//Init actualFrame
+		actualFrame := image.NewRGBA(image.Rect(0, 0, imgWidth, imgHeight))
+		//Add to actualFrame
+		draw.Draw(actualFrame, actualFrame.Bounds(), priorFrame, image.Point{X: 0, Y: 0}, draw.Over)
+
 		//Resize Image
-		resizedFrame := resize.Resize(uint(width), uint(height), frame, resize.Lanczos3)
+		resizedFrame := resize.Resize(uint(width), uint(height), actualFrame, resize.Lanczos3)
 
 		//Add to slice
 		frames = append(frames, resizedFrame)
@@ -81,4 +95,28 @@ func getChar(input byte) string {
 }
 func roundValue(value float64) int {
 	return int(math.Floor(value + 0.5))
+}
+
+func getGifDimensions(gif *gif.GIF) (x, y int) {
+	var lowestX int
+	var lowestY int
+	var highestX int
+	var highestY int
+
+	for _, img := range gif.Image {
+		if img.Rect.Min.X < lowestX {
+			lowestX = img.Rect.Min.X
+		}
+		if img.Rect.Min.Y < lowestY {
+			lowestY = img.Rect.Min.Y
+		}
+		if img.Rect.Max.X > highestX {
+			highestX = img.Rect.Max.X
+		}
+		if img.Rect.Max.Y > highestY {
+			highestY = img.Rect.Max.Y
+		}
+	}
+
+	return highestX - lowestX, highestY - lowestY
 }

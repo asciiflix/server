@@ -101,7 +101,23 @@ func DeleteVideo(videoId string, userId uint) error {
 		fmt.Println(videoId)
 		return errors.New("user does not match")
 	}
-	global_db.Where("uuid = ? AND user_id = ?", videoId, userId).Delete(&model.Video{})
+
+	//Delete Every Comment from this Video
+	result := global_db.Model(model.Comment{}).Where("video_id = ?", video.ID).Delete(&model.Comment{})
+	if result.Error != nil {
+		return result.Error
+	}
+
+	//Delete Every Like from this Video
+	result = global_db.Model(model.Like{}).Where("video_id = ?", video.ID).Delete(&model.Like{})
+	if result.Error != nil {
+		return result.Error
+	}
+
+	result = global_db.Where("uuid = ? AND user_id = ?", videoId, userId).Delete(&model.Video{})
+	if result.Error != nil {
+		return result.Error
+	}
 	return nil
 }
 
