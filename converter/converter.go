@@ -17,13 +17,15 @@ type video struct {
 	Frames []frame `json:"Frames"`
 }
 type frame struct {
-	Rows []string `json:"Rows"`
+	Rows   []string `json:"Rows"`
+	Colors []string `json:"Color"`
+	Delay  int      `json:"Delay"`
 }
 
 func ConvertGif(gifToConvert gif.GIF, width int, height int) (vidJson map[string]interface{}, err error) {
 
 	imgWidth, imgHeight := getGifDimensions(&gifToConvert)
-
+	var delay = gifToConvert.Delay
 	//Get default image
 	priorFrame := image.NewRGBA(image.Rect(0, 0, imgWidth, imgHeight))
 	draw.Draw(priorFrame, priorFrame.Bounds(), gifToConvert.Image[0], image.Point{X: 0, Y: 0}, draw.Src)
@@ -57,6 +59,11 @@ func ConvertGif(gifToConvert gif.GIF, width int, height int) (vidJson map[string
 		newWidth := size.Max.X
 		newHeight := size.Max.Y
 		video.Frames[frameIndex].Rows = make([]string, (newHeight))
+		video.Frames[frameIndex].Colors = make([]string, (newHeight))
+
+		//Save delay
+		video.Frames[frameIndex].Delay = delay[frameIndex]
+
 		for i := 0; i < newHeight; i++ {
 			for j := 0; j < newWidth; j++ {
 				//Get Color of pixel
@@ -66,15 +73,15 @@ func ConvertGif(gifToConvert gif.GIF, width int, height int) (vidJson map[string
 				b := reflect.ValueOf(color).FieldByName("B").Uint()
 				a := reflect.ValueOf(color).FieldByName("A").Uint()
 
+				//Save color
+				video.Frames[frameIndex].Colors[i] += fmt.Sprintf("rgba(%d,%d,%d,%d);", r, g, b, a)
+
 				//Calculate color intensity
 				intensity := (r + g + b) * a / 255
 
 				//Map color intensity to char and add it to row
-				//<pre color=rgba(red, green, blue, alpha)><pre>
 				step := float64(255 * 3 / (len(chars) - 1))
-				video.Frames[frameIndex].Rows[i] += fmt.Sprintf("<pre style='color:rgb(%d,%d,%d);'>", r, g, b)
 				video.Frames[frameIndex].Rows[i] += getChar(chars[roundValue(float64(intensity)/step)])
-				video.Frames[frameIndex].Rows[i] += "</pre>"
 			}
 		}
 	}
