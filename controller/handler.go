@@ -22,6 +22,7 @@ func initHandler(router *mux.Router) {
 	router.Path("/video/getVideo").Queries("id", "{id}").HandlerFunc(getVideo).Methods(http.MethodGet)
 	router.Path("/video/getVideos").HandlerFunc(getVideos).Methods(http.MethodGet)
 	router.Path("/video/getRecomendations").Queries("limit", "{limit}").HandlerFunc(getRecomendations).Methods(http.MethodGet)
+	router.Path("/video/getThumbnail").Queries("id", "{id}").HandlerFunc(getThumbnail).Methods(http.MethodGet)
 	router.Path("/user/getVideos").Queries("userID", "{userID}").HandlerFunc(getVideosFromUser).Methods(http.MethodGet)
 	//Video-Comments
 	router.Path("/video/getComments").Queries("id", "{id}").HandlerFunc(getComments).Methods(http.MethodGet)

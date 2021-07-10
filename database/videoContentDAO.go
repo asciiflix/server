@@ -1,6 +1,8 @@
 package database
 
 import (
+	"errors"
+
 	"github.com/asciiflix/server/config"
 	"github.com/asciiflix/server/model"
 	"go.mongodb.org/mongo-driver/bson"
@@ -69,4 +71,24 @@ func GetVideoContent(contentID primitive.ObjectID) map[string]interface{} {
 	var response = map[string]interface{}{"message": "Successfully found VideoContent by ID"}
 	response["content"] = videoContent
 	return response
+}
+
+func GetVideoThumbnail(contentID primitive.ObjectID) (interface{}, error) {
+	var videoContent model.VideoContent
+
+	//Search by ContentID for VideoContent Entry
+	err := getVideoCollection().FindOne(global_mongo_context, bson.M{"_id": contentID}).Decode(&videoContent)
+
+	//Error Handling
+	if err != nil {
+		config.Log.Error(err)
+		return nil, errors.New("not found")
+	}
+
+	var thumbnail interface{}
+	if frame, ok := videoContent.Video["Frames"].(primitive.A); ok {
+		thumbnail = frame[0]
+	}
+
+	return thumbnail, nil
 }

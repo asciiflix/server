@@ -87,6 +87,35 @@ func getVideosFromUser(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(videosPublic)
 }
 
+func getThumbnail(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	//Getting ContentID from UUID
+	param_id, err := database.GetContentID(mux.Vars(r)["id"])
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		config.Log.Error(err)
+		return
+	}
+
+	contentID, err := primitive.ObjectIDFromHex(param_id)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		config.Log.Error(err)
+		return
+	}
+
+	//DAO Error Handling
+	result, err := database.GetVideoThumbnail(contentID)
+	if err != nil {
+		basicVideoErrorHandler(err, w)
+		return
+	}
+
+	//Response
+	json.NewEncoder(w).Encode(result)
+}
+
 func createVideo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	video := model.VideoFull{}
