@@ -24,28 +24,19 @@ type frame struct {
 
 func ConvertGif(gifToConvert gif.GIF, width int, height int) (vidJson map[string]interface{}, err error) {
 
-	imgWidth, imgHeight := getGifDimensions(&gifToConvert)
 	var delay = gifToConvert.Delay
-	//Get default image
-	priorFrame := image.NewRGBA(image.Rect(0, 0, imgWidth, imgHeight))
-	draw.Draw(priorFrame, priorFrame.Bounds(), gifToConvert.Image[0], image.Point{X: 0, Y: 0}, draw.Src)
-
-	//Build image slice
 	var frames []image.Image
+	fmt.Println(gifToConvert.Disposal[1])
+	switch gifToConvert.Disposal[1] {
+	case gif.DisposalBackground:
+		frames = getFramesRTB(&gifToConvert, width, height)
+	case gif.DisposalPrevious:
+		frames = getFramesRTP(&gifToConvert, width, height)
+	case gif.DisposalNone:
+		frames = getFramesDND(&gifToConvert, width, height)
+	default:
+		frames = getFramesDND(&gifToConvert, width, height)
 
-	for _, frame := range gifToConvert.Image {
-		//Draw over priorFrame
-		draw.Draw(priorFrame, priorFrame.Bounds(), frame, image.Point{X: 0, Y: 0}, draw.Over)
-		//Init actualFrame
-		actualFrame := image.NewRGBA(image.Rect(0, 0, imgWidth, imgHeight))
-		//Add to actualFrame
-		draw.Draw(actualFrame, actualFrame.Bounds(), priorFrame, image.Point{X: 0, Y: 0}, draw.Over)
-
-		//Resize Image
-		resizedFrame := resize.Resize(uint(width), uint(height), actualFrame, resize.Lanczos3)
-
-		//Add to slice
-		frames = append(frames, resizedFrame)
 	}
 
 	video := video{}
@@ -106,6 +97,76 @@ func getChar(input byte) string {
 }
 func roundValue(value float64) int {
 	return int(math.Floor(value + 0.5))
+}
+
+//Do Not Dispose
+func getFramesDND(gif *gif.GIF, width int, height int) (frames []image.Image) {
+
+	imgWidth, imgHeight := getGifDimensions(gif)
+	//Get default image
+	priorFrame := image.NewRGBA(image.Rect(0, 0, imgWidth, imgHeight))
+	draw.Draw(priorFrame, priorFrame.Bounds(), gif.Image[0], image.Point{X: 0, Y: 0}, draw.Src)
+
+	//Build image slice
+	for _, frame := range gif.Image {
+		//Draw over priorFrame
+		draw.Draw(priorFrame, priorFrame.Bounds(), frame, image.Point{X: 0, Y: 0}, draw.Over)
+		//Init actualFrame
+		actualFrame := image.NewRGBA(image.Rect(0, 0, imgWidth, imgHeight))
+		//Add to actualFrame
+		draw.Draw(actualFrame, actualFrame.Bounds(), priorFrame, image.Point{X: 0, Y: 0}, draw.Over)
+
+		//Resize Image
+		resizedFrame := resize.Resize(uint(width), uint(height), actualFrame, resize.Lanczos3)
+
+		//Add to slice
+		frames = append(frames, resizedFrame)
+	}
+	return
+}
+
+//Restore To Previous
+func getFramesRTP(gif *gif.GIF, width int, height int) (frames []image.Image) {
+
+	imgWidth, imgHeight := getGifDimensions(gif)
+	//Get default image
+	priorFrame := image.NewRGBA(image.Rect(0, 0, imgWidth, imgHeight))
+	draw.Draw(priorFrame, priorFrame.Bounds(), gif.Image[0], image.Point{X: 0, Y: 0}, draw.Src)
+
+	//Build image slice
+	for _, frame := range gif.Image {
+		//Draw over priorFrame
+		draw.Draw(priorFrame, priorFrame.Bounds(), frame, image.Point{X: 0, Y: 0}, draw.Over)
+
+		//Init actualFrame
+		actualFrame := image.NewRGBA(image.Rect(0, 0, imgWidth, imgHeight))
+		//Add to actualFrame
+		draw.Draw(actualFrame, actualFrame.Bounds(), priorFrame, image.Point{X: 0, Y: 0}, draw.Over)
+
+		//Resize Image
+		resizedFrame := resize.Resize(uint(width), uint(height), actualFrame, resize.Lanczos3)
+
+		//Add to slice
+		frames = append(frames, resizedFrame)
+	}
+	return
+}
+
+//Restore to Background
+func getFramesRTB(gif *gif.GIF, width int, height int) (frames []image.Image) {
+
+	//TODO Get Background color
+
+	//Build image slice
+	for _, frame := range gif.Image {
+
+		//Resize Image
+		resizedFrame := resize.Resize(uint(width), uint(height), frame, resize.Lanczos3)
+
+		//Add to slice
+		frames = append(frames, resizedFrame)
+	}
+	return
 }
 
 func getGifDimensions(gif *gif.GIF) (x, y int) {
