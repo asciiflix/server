@@ -2,6 +2,7 @@ package converter
 
 import (
 	"encoding/json"
+	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
@@ -16,13 +17,15 @@ type video struct {
 	Frames []frame `json:"Frames"`
 }
 type frame struct {
-	Rows []string `json:"Rows"`
+	Rows   []string `json:"Rows"`
+	Colors []string `json:"Color"`
+	Delay  int      `json:"Delay"`
 }
 
 func ConvertGif(gifToConvert gif.GIF, width int, height int) (vidJson map[string]interface{}, err error) {
 
 	imgWidth, imgHeight := getGifDimensions(&gifToConvert)
-
+	var delay = gifToConvert.Delay
 	//Get default image
 	priorFrame := image.NewRGBA(image.Rect(0, 0, imgWidth, imgHeight))
 	draw.Draw(priorFrame, priorFrame.Bounds(), gifToConvert.Image[0], image.Point{X: 0, Y: 0}, draw.Src)
@@ -56,6 +59,11 @@ func ConvertGif(gifToConvert gif.GIF, width int, height int) (vidJson map[string
 		newWidth := size.Max.X
 		newHeight := size.Max.Y
 		video.Frames[frameIndex].Rows = make([]string, (newHeight))
+		video.Frames[frameIndex].Colors = make([]string, (newHeight))
+
+		//Save delay
+		video.Frames[frameIndex].Delay = delay[frameIndex]
+
 		for i := 0; i < newHeight; i++ {
 			for j := 0; j < newWidth; j++ {
 				//Get Color of pixel
@@ -64,6 +72,9 @@ func ConvertGif(gifToConvert gif.GIF, width int, height int) (vidJson map[string
 				g := reflect.ValueOf(color).FieldByName("G").Uint()
 				b := reflect.ValueOf(color).FieldByName("B").Uint()
 				a := reflect.ValueOf(color).FieldByName("A").Uint()
+
+				//Save color
+				video.Frames[frameIndex].Colors[i] += fmt.Sprintf("rgba(%d,%d,%d,%d);", r, g, b, a)
 
 				//Calculate color intensity
 				intensity := (r + g + b) * a / 255
