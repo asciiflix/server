@@ -2,6 +2,7 @@ package converter
 
 import (
 	"encoding/json"
+	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
@@ -16,33 +17,38 @@ type video struct {
 	Frames []frame `json:"Frames"`
 }
 type frame struct {
-	Rows []string `json:"Rows"`
+	Rows   []string `json:"Rows"`
+	Colors []string `json:"Color"`
+	Delay  int      `json:"Delay"`
 }
 
 func ConvertGif(gifToConvert gif.GIF, width int, height int) (vidJson map[string]interface{}, err error) {
 
-	imgWidth, imgHeight := getGifDimensions(&gifToConvert)
-
-	//Get default image
-	priorFrame := image.NewRGBA(image.Rect(0, 0, imgWidth, imgHeight))
-	draw.Draw(priorFrame, priorFrame.Bounds(), gifToConvert.Image[0], image.Point{X: 0, Y: 0}, draw.Src)
-
-	//Build image slice
+	var delay = gifToConvert.Delay
 	var frames []image.Image
 
-	for _, frame := range gifToConvert.Image {
-		//Draw over priorFrame
-		draw.Draw(priorFrame, priorFrame.Bounds(), frame, image.Point{X: 0, Y: 0}, draw.Over)
-		//Init actualFrame
-		actualFrame := image.NewRGBA(image.Rect(0, 0, imgWidth, imgHeight))
-		//Add to actualFrame
-		draw.Draw(actualFrame, actualFrame.Bounds(), priorFrame, image.Point{X: 0, Y: 0}, draw.Over)
+	imgWidth, imgHeigt := getGifDimensions(&gifToConvert)
+	startFrame := image.NewRGBA(image.Rect(0, 0, imgWidth, imgHeigt))
 
-		//Resize Image
-		resizedFrame := resize.Resize(uint(width), uint(height), actualFrame, resize.Lanczos3)
+	draw.Draw(startFrame, startFrame.Bounds(), gifToConvert.Image[0], image.Point{X: 0, Y: 0}, draw.Src)
 
-		//Add to slice
-		frames = append(frames, resizedFrame)
+	frames = append(frames, startFrame)
+
+	for i := 1; i < len(gifToConvert.Image); i++ {
+
+		switch gifToConvert.Disposal[i] {
+		case gif.DisposalBackground:
+			frames = append(frames, getFrameRTB(frames[i-1], gifToConvert.Image[i-1], gifToConvert.Image[i]))
+		case gif.DisposalPrevious:
+			frames = append(frames, getFrameRTP(frames, gifToConvert.Disposal, gifToConvert.Image[i]))
+		case gif.DisposalNone:
+			frames = append(frames, getFrameDND(frames[i-1], gifToConvert.Image[i]))
+		default:
+			frames = append(frames, getFrameDND(frames[i-1], gifToConvert.Image[i]))
+		}
+	}
+	for i := 0; i < len(frames); i++ {
+		frames[i] = resize.Resize(uint(width), uint(height), frames[i], resize.Lanczos3)
 	}
 
 	video := video{}
@@ -56,6 +62,11 @@ func ConvertGif(gifToConvert gif.GIF, width int, height int) (vidJson map[string
 		newWidth := size.Max.X
 		newHeight := size.Max.Y
 		video.Frames[frameIndex].Rows = make([]string, (newHeight))
+		video.Frames[frameIndex].Colors = make([]string, (newHeight))
+
+		//Save delay
+		video.Frames[frameIndex].Delay = delay[frameIndex]
+
 		for i := 0; i < newHeight; i++ {
 			for j := 0; j < newWidth; j++ {
 				//Get Color of pixel
@@ -64,6 +75,9 @@ func ConvertGif(gifToConvert gif.GIF, width int, height int) (vidJson map[string
 				g := reflect.ValueOf(color).FieldByName("G").Uint()
 				b := reflect.ValueOf(color).FieldByName("B").Uint()
 				a := reflect.ValueOf(color).FieldByName("A").Uint()
+
+				//Save color
+				video.Frames[frameIndex].Colors[i] += fmt.Sprintf("rgba(%d,%d,%d,%d);", r, g, b, a)
 
 				//Calculate color intensity
 				intensity := (r + g + b) * a / 255
@@ -95,6 +109,54 @@ func getChar(input byte) string {
 }
 func roundValue(value float64) int {
 	return int(math.Floor(value + 0.5))
+}
+
+//Do Not Dispose
+func getFrameDND(previousFrame image.Image, nextFrame image.Image) image.Image {
+
+	//Generate canvas
+	canvas := image.NewRGBA(image.Rect(0, 0, previousFrame.Bounds().Max.X, previousFrame.Bounds().Max.Y))
+	//Set last frame as base
+	draw.Draw(canvas, canvas.Bounds(), previousFrame, image.Point{X: 0, Y: 0}, draw.Src)
+	//Overdraw next frame
+	draw.Draw(canvas, canvas.Bounds(), nextFrame, image.Point{X: 0, Y: 0}, draw.Over)
+
+	return canvas
+}
+
+//Restore To Previous
+func getFrameRTP(frames []image.Image, disposal []byte, nextFrame image.Image) image.Image {
+
+	var canvas *image.RGBA
+	//Search last frame without DisposalPrevious
+	for i := len(frames) - 1; i > -1; i-- {
+		if disposal[i] != gif.DisposalPrevious {
+			canvas = image.NewRGBA(image.Rect(0, 0, frames[i].Bounds().Max.X, frames[i].Bounds().Max.Y))
+			//Set last frame as base
+			draw.Draw(canvas, canvas.Bounds(), frames[i], image.Point{X: 0, Y: 0}, draw.Src)
+
+		}
+	}
+	//Overdraw next frame
+	draw.Draw(canvas, canvas.Bounds(), nextFrame, image.Point{X: 0, Y: 0}, draw.Over)
+	return canvas
+}
+
+//Restore to Background
+func getFrameRTB(previousFrame image.Image, previousOverlay image.Image, nextFrame image.Image) image.Image {
+	//Generate canvas
+	canvas := image.NewRGBA(image.Rect(0, 0, previousFrame.Bounds().Max.X, previousFrame.Bounds().Max.Y))
+	//Set last frame as base
+	draw.Draw(canvas, canvas.Bounds(), previousFrame, image.Point{X: 0, Y: 0}, draw.Src)
+	//Clear last changes to transparent.
+	transparent := image.NewRGBA(image.Rect(previousOverlay.Bounds().Min.X, previousOverlay.Bounds().Min.Y, previousOverlay.Bounds().Max.X, previousOverlay.Bounds().Max.Y))
+	draw.Draw(canvas, canvas.Bounds(), transparent, image.Point{X: 0, Y: 0}, draw.Src)
+
+	//Overdraw next frame
+	draw.Draw(canvas, canvas.Bounds(), nextFrame, image.Point{X: 0, Y: 0}, draw.Over)
+
+	return canvas
+
 }
 
 func getGifDimensions(gif *gif.GIF) (x, y int) {
