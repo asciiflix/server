@@ -36,15 +36,11 @@ func initHandler(router *mux.Router) {
 	protected := router.PathPrefix("/secure").Subrouter()
 	protected.Use(jwtPreHandler)
 	protected.Path("/my_status").HandlerFunc(status).Methods(http.MethodGet)
-	//Video-Content
-	protected.Path("/video/createContent").HandlerFunc(createVideoContent).Methods(http.MethodPost)
-	protected.Path("/video/deleteContent").Queries("id", "{id}").HandlerFunc(deleteVideoContent).Methods(http.MethodDelete)
 	//User-Information
 	protected.Path("/user/getUser").Queries("id", "{id}").HandlerFunc(getPrivateUser).Methods(http.MethodGet)
 	protected.Path("/user/updateUser").Queries("id", "{id}").HandlerFunc(updateUser).Methods(http.MethodPut)
 	protected.Path("/user/deleteUser").Queries("id", "{id}").HandlerFunc(deleteUser).Methods(http.MethodDelete)
 	//Video
-	protected.Path("/video/createVideo").HandlerFunc(createVideo).Methods(http.MethodPost)
 	protected.Path("/video/uploadGif").HandlerFunc(createVideoFromGif).Methods(http.MethodPost)
 	protected.Path("/video/deleteVideo").Queries("id", "{id}").HandlerFunc(deleteVideo).Methods(http.MethodDelete)
 	protected.Path("/video/updateVideo").Queries("id", "{id}").HandlerFunc(updateVideo).Methods(http.MethodPut)
@@ -58,6 +54,15 @@ func initHandler(router *mux.Router) {
 	protected.Path("/video/getUserRecomendations").Queries("limit", "{limit}").HandlerFunc(getRecomendations).Methods(http.MethodGet)
 	//Logout
 	protected.Path("/logout").HandlerFunc(logout).Methods(http.MethodGet)
+
+	//Dev-Endpoints
+	if config.Version == "development" {
+		//Video
+		protected.Path("/video/createVideo").HandlerFunc(createVideo).Methods(http.MethodPost)
+		//Video-Content
+		protected.Path("/video/createContent").HandlerFunc(createVideoContent).Methods(http.MethodPost)
+		protected.Path("/video/deleteContent").Queries("id", "{id}").HandlerFunc(deleteVideoContent).Methods(http.MethodDelete)
+	}
 }
 
 func status(w http.ResponseWriter, r *http.Request) {
