@@ -31,7 +31,6 @@ func createVideoContent(w http.ResponseWriter, r *http.Request) {
 		//Response
 		json.NewEncoder(w).Encode(result)
 	}
-
 }
 
 func getVideoContent(w http.ResponseWriter, r *http.Request) {
