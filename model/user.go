@@ -28,6 +28,7 @@ type UserDetailsPrivate struct {
 	Email       string
 	Description string
 	Picture_ID  string
+	Verified    bool
 	Videos      []VideoPublic
 	Comments    []Comment
 	Likes       []Like
@@ -90,6 +91,7 @@ func (user User) GetPrivateUser() UserDetailsPrivate {
 	privateUser.Picture_ID = user.Picture_ID
 	privateUser.Comments = user.Comments
 	privateUser.Likes = user.Likes
+	privateUser.Verified = user.Verified
 	for _, videos := range user.Videos {
 		privateUser.Videos = append(privateUser.Videos, GetPublicVideo(videos))
 	}
