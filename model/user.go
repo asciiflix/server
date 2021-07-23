@@ -1,6 +1,8 @@
 package model
 
 import (
+	"time"
+
 	"github.com/dgrijalva/jwt-go"
 	"gorm.io/gorm"
 )
@@ -13,6 +15,7 @@ type User struct {
 	Password    string
 	Picture_ID  string
 	Description string
+	Verified    bool
 	Videos      []Video   `gorm:"ForeignKey:UserID"`
 	Comments    []Comment `gorm:"ForeignKey:UserID"`
 	Likes       []Like    `gorm:"ForeignKey:UserID"`
@@ -43,6 +46,14 @@ type UserDetailsPublic struct {
 type UserLogin struct {
 	Email    string
 	Password string
+}
+
+//VerificationCode struct
+type VerificationCode struct {
+	ID     uint `gorm:"primaryKey"`
+	UserID uint
+	Code   string
+	Expiry time.Time
 }
 
 //Login Struct

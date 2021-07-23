@@ -54,6 +54,9 @@ func initHandler(router *mux.Router) {
 	protected.Path("/video/getUserRecomendations").Queries("limit", "{limit}").HandlerFunc(getRecomendations).Methods(http.MethodGet)
 	//Logout
 	protected.Path("/logout").HandlerFunc(logout).Methods(http.MethodGet)
+	//Verifcation
+	protected.Path("/user/sendCode").HandlerFunc(sendVerifyCode).Methods(http.MethodPost)
+	protected.Path("/user/verify").Queries("code", "{code}").HandlerFunc(verifyUser).Methods(http.MethodPut)
 
 	//Dev-Endpoints
 	if config.Version == "development" {

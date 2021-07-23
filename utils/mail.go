@@ -9,7 +9,7 @@ import (
 	"github.com/asciiflix/server/config"
 )
 
-func SendWelcomeMail(to string, username string) error {
+func SendWelcomeMail(to string, username string, code string) error {
 
 	//Authenticate with server using login and password
 	auth := smtp.PlainAuth("", config.SMTP.User, config.SMTP.Password, config.SMTP.Host)
@@ -26,7 +26,7 @@ func SendWelcomeMail(to string, username string) error {
 		Message string
 	}{
 		Name:    username,
-		Message: "Yoo whats up!!",
+		Message: "Your verification Code is: " + code + " it expires in 2 days.",
 	})
 
 	//SendMail

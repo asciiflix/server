@@ -34,6 +34,6 @@ func ConnectToDatabase() {
 	config.Log.Info("Connected to DB")
 	global_db = db
 
-	db.AutoMigrate(&model.User{}, &model.Video{}, &model.Comment{}, &model.Like{}, &model.JwtBlacklist{})
+	db.AutoMigrate(&model.User{}, &model.Video{}, &model.Comment{}, &model.Like{}, &model.JwtBlacklist{}, &model.VerificationCode{})
 
 }
