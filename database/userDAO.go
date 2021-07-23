@@ -25,6 +25,11 @@ func RegisterUser(user model.User) map[string]interface{} {
 		return map[string]interface{}{"message": "Password Encryption Failed."}
 	}
 
+	//Clean User
+	user.Videos = nil
+	user.Comments = nil
+	user.Likes = nil
+
 	//Register User in DB
 	global_db.Create(&user)
 	response := map[string]interface{}{"message": "User successfully registered."}

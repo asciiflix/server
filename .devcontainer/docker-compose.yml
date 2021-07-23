@@ -17,9 +17,11 @@ services:
     - MONGO_PORT=27017
     - MONGO_USERNAME=asciiflix
     - MONGO_PASSWORD=fucking_change_this_to_env_file
+    - API_PORT=8080
+    - LOG_LEVEL=6
     command: /bin/zsh -c "while sleep 1000; do :; done"
   video_storage:
-    image: mongo
+    image: mongo:4-bionic
     restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: asciiflix
@@ -29,14 +31,12 @@ services:
     ports:
       - 27017:27017
   database:
-    image: postgres
+    image: postgres:13
     restart: unless-stopped
     environment:
       - POSTGRES_DB=asciiflix_db
       - POSTGRES_USER=asciiflix
       - POSTGRES_PASSWORD=asciiflixpassword
-      - API_PORT=8080
-      - LOG_LEVEL=6
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
