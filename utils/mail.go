@@ -19,8 +19,7 @@ func SendWelcomeMail(to string, username string, code string) error {
 	var body bytes.Buffer
 
 	mimeHeaders := "MIME-version: 1.0; \nContent-Type: text/html; charset=\"UTF-8\";\n\n"
-	body.Write([]byte(fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: Welcome to ASCIIflix\r\n%s\n\n", config.SMTP.User, config.SMTP.User, mimeHeaders)))
-	//body2 := []byte("From: john.doe@example.com\r\n" + "To: roger.roe@example.com\r\n" + "Subject: Test mail\r\n\r\n")
+	body.Write([]byte(fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: Welcome to ASCIIflix\r\n%s\n\n", config.SMTP.User, to, mimeHeaders)))
 
 	mail.Execute(&body, struct {
 		Name    string
