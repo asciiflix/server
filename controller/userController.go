@@ -29,7 +29,8 @@ func register(w http.ResponseWriter, r *http.Request) {
 		} else {
 			w.WriteHeader(http.StatusCreated)
 		}
-		//Return message
+		//Return message and send Mail
+		utils.SendWelcomeMail(user.Email, user.Name)
 		json.NewEncoder(w).Encode(result)
 	}
 }
