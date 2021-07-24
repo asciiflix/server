@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/asciiflix/server/database"
@@ -29,7 +30,11 @@ func register(w http.ResponseWriter, r *http.Request) {
 		} else {
 			w.WriteHeader(http.StatusCreated)
 		}
-		//Return message
+
+		//Return message and send Mail
+		userID, _ := utils.ParseStringToUint(fmt.Sprintf("%v", result["id"]))
+		code, _ := database.GenerateVerificationCode(userID)
+		utils.SendWelcomeMail(user.Email, user.Name, code)
 		json.NewEncoder(w).Encode(result)
 	}
 }
@@ -200,4 +205,53 @@ func getAllUsers(w http.ResponseWriter, r *http.Request) {
 	//Sending Response
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(users)
+}
+
+//Verify User
+func verifyUser(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	//Get Code from params
+	code := mux.Vars(r)["code"]
+
+	//Get User by JWT
+	claims, _ := getJWTClaims(r)
+
+	//Get User from DB
+	err := database.VerifyUser(claims.User_ID, code)
+	if err != nil {
+		json.NewEncoder(w).Encode(map[string]interface{}{"message": err.Error()})
+		return
+	}
+
+	//Response
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]interface{}{"message": "User has been verified."})
+}
+
+func sendVerifyCode(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	//Get User by JWT
+	claims, _ := getJWTClaims(r)
+
+	//Get User from DB
+	user, err := database.GetPrivateUser(utils.ParseUintToString(claims.User_ID))
+	if err != nil {
+		json.NewEncoder(w).Encode(map[string]interface{}{"message": err.Error()})
+		return
+	}
+
+	//Generate Code
+	code, err := database.GenerateVerificationCode(user.UserID)
+	if err != nil {
+		json.NewEncoder(w).Encode(map[string]interface{}{"message": err.Error()})
+		return
+	}
+	//Send Email
+	utils.SendWelcomeMail(user.Email, user.Name, code)
+
+	//Response
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]interface{}{"message": "Verification Code has been sent."})
 }

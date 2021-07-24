@@ -21,6 +21,13 @@ type MongoDBConfig struct {
 	Password string `mapstructure:"MONGO_PASSWORD"`
 }
 
+type SMTPConfig struct {
+	Host     string `mapstructure:"SMTP_HOST"`
+	Port     string `mapstructure:"SMTP_PORT"`
+	User     string `mapstructure:"SMTP_USERNAME"`
+	Password string `mapstructure:"SMTP_PASSWORD"`
+}
+
 type APIConfig struct {
 	Port        int    `mapstructure:"API_PORT"`
 	JWTKey      string `mapstructure:"JWT_PRIVATE_KEY"`
@@ -33,6 +40,7 @@ var Version = "development"
 var Database DBConfig
 var ApiConfig APIConfig
 var MongoDB MongoDBConfig
+var SMTP SMTPConfig
 
 func GetConfig() {
 	viper.SetConfigName("config")
@@ -50,8 +58,9 @@ func GetConfig() {
 	err_db := viper.Unmarshal(&Database)
 	err_mongoDB := viper.Unmarshal(&MongoDB)
 	err_api := viper.Unmarshal(&ApiConfig)
+	err_smtp := viper.Unmarshal(&SMTP)
 
-	if err_db != nil || err_api != nil || err_mongoDB != nil {
+	if err_db != nil || err_api != nil || err_mongoDB != nil || err_smtp != nil {
 		fmt.Printf("Unable to decode into struct, %v", err)
 	}
 

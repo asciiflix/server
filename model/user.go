@@ -1,6 +1,8 @@
 package model
 
 import (
+	"time"
+
 	"github.com/dgrijalva/jwt-go"
 	"gorm.io/gorm"
 )
@@ -13,6 +15,7 @@ type User struct {
 	Password    string
 	Picture_ID  string
 	Description string
+	Verified    bool
 	Videos      []Video   `gorm:"ForeignKey:UserID"`
 	Comments    []Comment `gorm:"ForeignKey:UserID"`
 	Likes       []Like    `gorm:"ForeignKey:UserID"`
@@ -25,6 +28,7 @@ type UserDetailsPrivate struct {
 	Email       string
 	Description string
 	Picture_ID  string
+	Verified    bool
 	Videos      []VideoPublic
 	Comments    []Comment
 	Likes       []Like
@@ -43,6 +47,14 @@ type UserDetailsPublic struct {
 type UserLogin struct {
 	Email    string
 	Password string
+}
+
+//VerificationCode struct
+type VerificationCode struct {
+	ID     uint `gorm:"primaryKey"`
+	UserID uint
+	Code   string
+	Expiry time.Time
 }
 
 //Login Struct
@@ -79,6 +91,7 @@ func (user User) GetPrivateUser() UserDetailsPrivate {
 	privateUser.Picture_ID = user.Picture_ID
 	privateUser.Comments = user.Comments
 	privateUser.Likes = user.Likes
+	privateUser.Verified = user.Verified
 	for _, videos := range user.Videos {
 		privateUser.Videos = append(privateUser.Videos, GetPublicVideo(videos))
 	}
