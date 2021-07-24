@@ -220,6 +220,7 @@ func verifyUser(w http.ResponseWriter, r *http.Request) {
 	//Get User from DB
 	err := database.VerifyUser(claims.User_ID, code)
 	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode(map[string]interface{}{"message": err.Error()})
 		return
 	}
