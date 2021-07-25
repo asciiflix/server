@@ -10,7 +10,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// TODO replace with dependency injection
 var global_mongo_client *mongo.Client
 var global_mongo_context context.Context
 

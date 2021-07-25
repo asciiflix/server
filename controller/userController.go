@@ -34,7 +34,7 @@ func register(w http.ResponseWriter, r *http.Request) {
 		//Return message and send Mail
 		userID, _ := utils.ParseStringToUint(fmt.Sprintf("%v", result["id"]))
 		code, _ := database.GenerateVerificationCode(userID)
-		utils.SendWelcomeMail(user.Email, user.Name, code)
+		go utils.SendWelcomeMail(user.Email, user.Name, code)
 		json.NewEncoder(w).Encode(result)
 	}
 }
@@ -250,7 +250,7 @@ func sendVerifyCode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//Send Email
-	utils.SendWelcomeMail(user.Email, user.Name, code)
+	go utils.SendWelcomeMail(user.Email, user.Name, code)
 
 	//Response
 	w.WriteHeader(http.StatusOK)
