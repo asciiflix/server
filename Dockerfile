@@ -11,4 +11,5 @@ FROM scratch
 WORKDIR /
 COPY --from=builder /main ./
 COPY ./config.env ./
+COPY ./templates/ ./templates
 ENTRYPOINT ["./main"]

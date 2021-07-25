@@ -8,6 +8,7 @@ import (
 	"github.com/asciiflix/server/model"
 	"github.com/asciiflix/server/utils"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gofrs/uuid"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"gorm.io/gorm"
 )
@@ -29,6 +30,7 @@ func RegisterUser(user model.User) map[string]interface{} {
 	user.Videos = nil
 	user.Comments = nil
 	user.Likes = nil
+	user.Verified = false
 
 	//Register User in DB
 	global_db.Create(&user)
@@ -243,4 +245,53 @@ func GetAllUsers() ([]model.UserDetailsPublic, error) {
 	}
 
 	return publicInformation, nil
+}
+
+//Generate Verification Code for User
+func GenerateVerificationCode(userID uint) (string, error) {
+	code, _ := uuid.NewV4()
+	verificationItem := model.VerificationCode{
+		UserID: userID,
+		Code:   code.String(),
+		Expiry: time.Now().Add(time.Hour * 24 * 2),
+	}
+
+	result := global_db.Create(&verificationItem)
+	if result.Error != nil {
+		return "", result.Error
+	}
+	return verificationItem.Code, nil
+}
+
+func VerifyUser(userID uint, code string) error {
+	verificationItem := model.VerificationCode{
+		UserID: userID,
+		Code:   code,
+	}
+
+	result := global_db.Where("user_id = ? AND code = ?", userID, code).First(&verificationItem)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if verificationItem.Expiry.Before(time.Now()) {
+		return errors.New("verification code expired")
+	}
+
+	var userToUpdate model.User
+	result = global_db.Where("id = ?", userID).First(&userToUpdate)
+	if result.Error != nil {
+		return errors.New("user does not exist")
+	}
+	userToUpdate.Verified = true
+
+	if !userToUpdate.Verified {
+		//Update Values in Database
+		result = global_db.Model(&userToUpdate).Updates(userToUpdate)
+		if result.Error != nil {
+			return result.Error
+		}
+	}
+
+	return nil
 }
