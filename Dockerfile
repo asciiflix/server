@@ -7,7 +7,7 @@ WORKDIR /server
 ENV GO111MODULE=on
 RUN CGO_ENABLED=0 go build -ldflags "-X 'github.com/asciiflix/server/config.Version=$VERSION'" -o /main .
 
-FROM alpine
+FROM alpine:3.14
 WORKDIR /
 COPY --from=builder /main ./
 COPY ./config.env ./
