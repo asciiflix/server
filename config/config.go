@@ -34,6 +34,7 @@ type APIConfig struct {
 	LogLevel    int    `mapstructure:"LOG_LEVEL"`
 	ASCIIWidth  int    `mapstructure:"ASCII_WIDTH"`
 	ASCIIHeight int    `mapstructure:"ASCII_HEIGHT"`
+	FrontendURL string `mapstructure:"FRONTEND_URL"`
 }
 
 var Version = "development"
