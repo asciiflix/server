@@ -22,11 +22,15 @@ func SendWelcomeMail(to string, username string, code string) error {
 	body.Write([]byte(fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: Welcome to ASCIIflix\r\n%s\n\n", config.SMTP.User, to, mimeHeaders)))
 
 	mail.Execute(&body, struct {
-		Name    string
-		Message string
+		Name       string
+		Message    string
+		URL        string
+		URL_Verify string
 	}{
-		Name:    username,
-		Message: "Your verification Code is: " + code + " it expires in 2 days.",
+		Name:       username,
+		Message:    "Your verification Code is: " + code + " it expires in 2 days.",
+		URL:        config.ApiConfig.FrontendURL + "/login",
+		URL_Verify: config.ApiConfig.FrontendURL + "/verify",
 	})
 
 	//SendMail
