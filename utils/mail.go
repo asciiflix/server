@@ -14,7 +14,7 @@ func SendWelcomeMail(to string, username string, code string) error {
 	//Authenticate with server using login and password
 	auth := smtp.PlainAuth("", config.SMTP.User, config.SMTP.Password, config.SMTP.Host)
 
-	mail, _ := template.ParseFiles("templates/welcome-mail.html")
+	mail, _ := template.ParseFiles("./templates/welcome-mail.html")
 
 	var body bytes.Buffer
 
