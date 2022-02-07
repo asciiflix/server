@@ -9,7 +9,7 @@ import (
 	"github.com/asciiflix/server/config"
 	"github.com/asciiflix/server/database"
 	"github.com/asciiflix/server/model"
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v4"
 )
 
 //Getting JWTClaims from Header without Validation
