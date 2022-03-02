@@ -10,6 +10,6 @@ RUN CGO_ENABLED=0 go build -ldflags "-X 'github.com/asciiflix/server/config.Vers
 FROM alpine:3.15
 WORKDIR /
 COPY --from=builder /main ./
-COPY ./config.env ./
+COPY ./config.env.example ./config.env
 COPY ./templates/ ./templates
 ENTRYPOINT ["./main"]
