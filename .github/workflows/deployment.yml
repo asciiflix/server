@@ -33,7 +33,6 @@ jobs:
           context: .
           build-args: VERSION=${{ steps.tag_version.outputs.new_tag }}
           push: true
-          addLatest: true
           tags: |
             ghcr.io/asciiflix/server:latest
             ghcr.io/asciiflix/server:${{ steps.tag_version.outputs.new_tag }}
