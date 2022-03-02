@@ -33,7 +33,7 @@ services:
       - "traefik.docker.network=proxy"
       - "traefik.http.routers.asciiflix_server.rule=Host(`api.asciiflix.de`)"
       - "traefik.http.routers.asciiflix_server.entrypoints=websecure"
-      - "traefik.http.routers.asciiflix_server.tls.certresolver=myhttpchallenge"
+      - "traefik.http.routers.asciiflix_server.tls.certresolver=gmyhttpchallenge"
     networks:
       - backend
       - proxy
