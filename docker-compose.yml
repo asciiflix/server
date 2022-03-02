@@ -23,6 +23,8 @@ services:
     container_name: asciiflix_server
     restart: always
     env_file: ../config.env
+    volumes:
+      - ../config.env:/config.env
     depends_on:
       - database
       - video_storage
