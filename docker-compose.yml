@@ -19,10 +19,10 @@ services:
     volumes:
       - mongo-data:/data/db
   server:
-    image: ghcr.io/asciiflix/server:latest
+    image: ghcr.io/asciiflix/server:${VESION}
     container_name: asciiflix_server
     restart: always
-    env_file: ./config.env
+    env_file: ../config.env
     depends_on:
       - database
       - video_storage

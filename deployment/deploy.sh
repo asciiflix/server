@@ -13,7 +13,7 @@ echo "Replacing config.env with prod config"
 cp ~/config.env ./config.env
 
 echo "Starting builded containers"
-docker-compose up -d
+VERSION=$1 docker-compose up -d
 
 echo "Cleaning Up Source Files"
 rm -rf ~/server
