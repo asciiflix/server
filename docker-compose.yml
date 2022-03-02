@@ -4,7 +4,7 @@ services:
     image: postgres:13
     container_name: asciiflix_db
     restart: always
-    env_file: ./config.env
+    env_file: ../config.env
     networks:
       - backend
     volumes:
@@ -13,13 +13,13 @@ services:
     image: mongo:4-bionic
     container_name: asciiflix_videos
     restart: always
-    env_file: ./config.env
+    env_file: ../config.env
     networks:
       - backend
     volumes:
       - mongo-data:/data/db
   server:
-    image: ghcr.io/asciiflix/server:${VESION}
+    image: ghcr.io/asciiflix/server:${VERSION}
     container_name: asciiflix_server
     restart: always
     env_file: ../config.env

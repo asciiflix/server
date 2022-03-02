@@ -9,9 +9,6 @@ cd ./server
 echo "Swichting to Master-Branch"
 git switch master
 
-echo "Replacing config.env with prod config"
-cp ~/config.env ./config.env
-
 echo "Starting builded containers"
 VERSION=$1 docker-compose up -d
 
