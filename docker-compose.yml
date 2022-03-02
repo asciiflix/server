@@ -19,11 +19,7 @@ services:
     volumes:
       - mongo-data:/data/db
   server:
-    build:
-      context: .
-      args:
-        - VERSION=TEST
-    image: asciiflix_server
+    image: ghcr.io/asciiflix/server:latest
     container_name: asciiflix_server
     restart: always
     env_file: ./config.env
@@ -35,7 +31,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
-      - "traefik.http.routers.asciiflix_server.rule=Host(`api.asciiflix.tech`)"
+      - "traefik.http.routers.asciiflix_server.rule=Host(`api.asciiflix.de`)"
       - "traefik.http.routers.asciiflix_server.entrypoints=websecure"
       - "traefik.http.routers.asciiflix_server.tls.certresolver=myhttpchallenge"
     networks:
