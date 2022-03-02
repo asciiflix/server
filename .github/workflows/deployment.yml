@@ -45,4 +45,4 @@ jobs:
           port: ${{ secrets.PORT }}
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_KEY }}
-          script: ./deploy.sh
+          script: ./deploy.sh ${{ steps.tag_version.outputs.new_tag }}
