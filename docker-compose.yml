@@ -10,7 +10,7 @@ services:
     volumes:
       - data:/var/lib/postgresql/data
   video_storage:
-    image: mongo:4-bionic
+    image: mongo:5-focal
     container_name: asciiflix_videos
     restart: always
     env_file: ../config.env
