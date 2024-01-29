@@ -38,11 +38,11 @@ jobs:
             ghcr.io/asciiflix/server:${{ steps.tag_version.outputs.new_tag }}
           labels: asciiflix/server
 
-      - name: Redeploy Docker Compose
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          port: ${{ secrets.PORT }}
-          username: ${{ secrets.USER }}
-          key: ${{ secrets.SSH_KEY }}
-          script: ./deploy.sh ${{ steps.tag_version.outputs.new_tag }}
+#      - name: Redeploy Docker Compose
+#        uses: appleboy/ssh-action@master
+#        with:
+#          host: ${{ secrets.HOST }}
+#          port: ${{ secrets.PORT }}
+#          username: ${{ secrets.USER }}
+#          key: ${{ secrets.SSH_KEY }}
+#          script: ./deploy.sh ${{ steps.tag_version.outputs.new_tag }}

@@ -21,7 +21,7 @@ services:
     - LOG_LEVEL=6
     command: /bin/zsh -c "while sleep 1000; do :; done"
   video_storage:
-    image: mongo:4-bionic
+    image: mongo:5-focal
     restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: asciiflix
